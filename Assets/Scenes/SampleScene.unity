@@ -272,7 +272,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1973991551936340, guid: b571edb9f79c5ab48bb80107b2793621, type: 3}
       propertyPath: m_Name
-      value: Chao
+      value: Minchen
       objectReference: {fileID: 0}
     - target: {fileID: 4329924105872682, guid: b571edb9f79c5ab48bb80107b2793621, type: 3}
       propertyPath: m_LocalPosition.x
