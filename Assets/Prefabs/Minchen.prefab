@@ -240,7 +240,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 12533db06d35af3499fbbc961b3cf3d1, type: 2}
+  - {fileID: 2100000, guid: aaeeab5b7f86bb34ba6091638b19673b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -501,7 +501,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 12533db06d35af3499fbbc961b3cf3d1, type: 2}
+  - {fileID: 2100000, guid: aaeeab5b7f86bb34ba6091638b19673b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -547,13 +547,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1911224592923410}
-  m_LocalRotation: {x: 0.04182511, y: 0.101598874, z: 0.7058687, w: 0.6997698}
-  m_LocalPosition: {x: 0.253, y: -0.30000007, z: -0.24}
+  m_LocalRotation: {x: 0.030492801, y: 0.090160005, z: 0.7074207, w: 0.7003551}
+  m_LocalPosition: {x: 0.167, y: -0.30000007, z: -0.222}
   m_LocalScale: {x: 0.23014142, y: 0.31874436, z: 0.32319772}
   m_Children: []
   m_Father: {fileID: 4329924105872682}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: -4.8700004, y: 11.652, z: 90}
+  m_LocalEulerAnglesHint: {x: -4.867, y: 9.790001, z: 90.158005}
 --- !u!33 &33624326864843196
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -625,6 +625,7 @@ GameObject:
   - component: {fileID: 33762693331942730}
   - component: {fileID: 23715763533099552}
   - component: {fileID: 135184478041395326}
+  - component: {fileID: 6631996889512838283}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -671,7 +672,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b7b883ae4eeba1d40bdde9c3dbdd1bcd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -704,6 +705,22 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &6631996889512838283
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964656590325742}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!1 &1973991551936340
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,7 +732,7 @@ GameObject:
   - component: {fileID: 4329924105872682}
   - component: {fileID: 2876957347743259112}
   m_Layer: 0
-  m_Name: Chao
+  m_Name: Minchen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
