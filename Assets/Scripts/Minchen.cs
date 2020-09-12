@@ -13,6 +13,11 @@ public class Minchen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        DebugMove();
+    }
+
+    void DebugMove()
+    {
+      transform.Translate((Input.GetAxis("Vertical")) * 1000, 0, 0);
     }
 }
