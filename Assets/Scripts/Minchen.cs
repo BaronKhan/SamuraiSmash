@@ -2,22 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*public enum MinchenState
+{
+  Idle,
+  Stance,
+  Dash,
+  Slash
+}*/
+
 public class Minchen : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+  private float x = 0;
+  private float z = 0;
+  //Queue<>
 
-    // Update is called once per frame
-    void Update()
-    {
-        DebugMove();
-    }
+  // Start is called before the first frame update
+  void Start()
+  {
+    x = transform.position.x;
+    z = transform.position.z;
+  }
 
-    void DebugMove()
-    {
-      transform.Translate((Input.GetAxis("Vertical")) * 1000, 0, 0);
-    }
+  // Update is called once per frame
+  void Update()
+  {
+    //if (Input.GetTouch(0))
+  }
 }
