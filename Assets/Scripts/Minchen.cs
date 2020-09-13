@@ -20,6 +20,7 @@ public class Minchen : MonoBehaviour
   //---------------------------------------------------------------------------
 
   public float movement_speed = 1f;
+  public float rotate_speed = 10f;
 
   private float x = 0;
   private float z = 0;
@@ -62,6 +63,7 @@ public class Minchen : MonoBehaviour
 
   void updateState()
   {
+    MinchenState old_state = state;
     switch (state)
     {
       case MinchenState.Stance:
@@ -76,6 +78,15 @@ public class Minchen : MonoBehaviour
             state = MinchenState.Stance;
           break;
         }
+      case MinchenState.Slash:
+        {
+          state = MinchenState.Stance;
+          break;
+        }
+    }
+    if (old_state != state)
+    {
+      print(state);
     }
     updateAnimation();
   }
@@ -99,7 +110,7 @@ public class Minchen : MonoBehaviour
     Vector3 v = (transform.position - target_enemy.transform.position);
     float distance = v.magnitude;
     Vector3 direction = v.normalized;
-    if (distance < 2.0f)
+    if (distance < 2.5f)
     {
       target_enemy = null;
       state = MinchenState.Slash;
@@ -108,6 +119,11 @@ public class Minchen : MonoBehaviour
     {
       float step = Time.deltaTime * movement_speed;
       transform.position = Vector3.MoveTowards(transform.position, target_enemy.transform.position, step);
+
+      Quaternion lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
+
+      //rotate us over time according to speed until we are in the required rotation
+      transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotate_speed);
     }
   }
 
