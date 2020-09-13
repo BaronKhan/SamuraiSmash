@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//-----------------------------------------------------------------------------
+
 public enum MinchenState
 {
   Idle,
@@ -10,9 +12,14 @@ public enum MinchenState
   Slash
 }
 
+//-----------------------------------------------------------------------------
+
 public class Minchen : MonoBehaviour
 {
-  public float movement_speed = 0.1f;
+
+  //---------------------------------------------------------------------------
+
+  public float movement_speed = 1f;
 
   private float x = 0;
   private float z = 0;
@@ -22,6 +29,8 @@ public class Minchen : MonoBehaviour
 
   private MinchenState state = MinchenState.Stance;
 
+  //---------------------------------------------------------------------------
+
   // Start is called before the first frame update
   void Start()
   {
@@ -30,46 +39,94 @@ public class Minchen : MonoBehaviour
     animator = GetComponent<Animator>();
   }
 
+  //---------------------------------------------------------------------------
+
   // Update is called once per frame
   void Update()
   {
     processTouch();
     step();
-    this.transform.Translate(10 * Time.deltaTime * transform.forward);
   }
+
+  //---------------------------------------------------------------------------
 
   void step()
   {
-    if (target_enemy)
+    updateState();
+
+    if (state == MinchenState.Dash)
+      moveToEnemy();
+  }
+
+  //---------------------------------------------------------------------------
+
+  void updateState()
+  {
+    switch (state)
     {
-      Vector3 v = (transform.position - target_enemy.transform.position);
-      float distance = v.magnitude;
-      Vector3 direction = v.normalized;
-      if (distance < 2.0f)
-        target_enemy = null;
-      else
+      case MinchenState.Stance:
+        {
+          if (target_enemy)
+            state = MinchenState.Dash;
+          break;
+        }
+      case MinchenState.Dash:
+        {
+          if (!target_enemy)
+            state = MinchenState.Stance;
+          break;
+        }
+    }
+    updateAnimation();
+  }
+
+  //-----------------------------------------------------------------------------
+
+  void updateAnimation()
+  {
+    animator.SetBool("isFighting", state != MinchenState.Idle);
+    animator.SetBool("isWalking", state == MinchenState.Dash);
+    animator.SetInteger("walkingSpeed", 6);
+  }
+
+  //-----------------------------------------------------------------------------
+
+  void moveToEnemy()
+  {
+    if (!target_enemy)
+      return;
+
+    Vector3 v = (transform.position - target_enemy.transform.position);
+    float distance = v.magnitude;
+    Vector3 direction = v.normalized;
+    if (distance < 2.0f)
+    {
+      target_enemy = null;
+      state = MinchenState.Slash;
+    }
+    else
+    {
+      float step = Time.deltaTime * movement_speed;
+      transform.position = Vector3.MoveTowards(transform.position, target_enemy.transform.position, step);
+    }
+  }
+
+  //-----------------------------------------------------------------------------
+
+  void processTouch()
+  {
+    if (Input.GetMouseButtonUp(0))
+    {
+      Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+      RaycastHit hit_info;
+      if (Physics.Raycast(ray.origin, ray.direction, out hit_info))
       {
-        float step = Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position, target_enemy.transform.position, step);
+        if (hit_info.collider.tag == "Enemy")
+          target_enemy = hit_info.collider.gameObject;
       }
     }
   }
 
-  void processTouch()
-  {
-      if (Input.GetMouseButtonUp(0))
-      {
-        print("touch released");
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit_info;
-        if (Physics.Raycast(ray.origin, ray.direction, out hit_info))
-        {
-          if (hit_info.collider.tag == "Enemy")
-          {
-            print("hit enemy");
-            target_enemy = hit_info.collider.gameObject;
-          }
-        }
-      }
-  }
+  //-----------------------------------------------------------------------------
+
 }
