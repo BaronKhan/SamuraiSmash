@@ -46,17 +46,7 @@ public class Minchen : MonoBehaviour
   void Update()
   {
     processTouch();
-    step();
-  }
-
-  //---------------------------------------------------------------------------
-
-  void step()
-  {
     updateState();
-
-    if (state == MinchenState.Dash)
-      moveToEnemy();
   }
 
   //---------------------------------------------------------------------------
@@ -74,46 +64,51 @@ public class Minchen : MonoBehaviour
         }
       case MinchenState.Dash:
         {
-          if (!target_enemy)
-            state = MinchenState.Stance;
+          if (!moveToEnemy())
+            state = MinchenState.Slash;
           break;
         }
       case MinchenState.Slash:
         {
-          state = MinchenState.Stance;
+          slashEnemy();
+          if (animator.GetCurrentAnimatorStateInfo(0).IsName("Slash1") && !target_enemy)
+            state = MinchenState.Stance;
           break;
         }
     }
+
+    updateAnimation(old_state);
+  }
+
+  //-----------------------------------------------------------------------------
+
+  void updateAnimation(MinchenState old_state)
+  {
+    animator.SetBool("isFighting", true);
+    animator.SetBool("isWalking", state == MinchenState.Dash);
+    animator.SetInteger("walkingSpeed", 6);
+
     if (old_state != state)
     {
       print(state);
+      if (state == MinchenState.Slash)
+        animator.SetTrigger("slash");
     }
-    updateAnimation();
   }
 
   //-----------------------------------------------------------------------------
 
-  void updateAnimation()
-  {
-    animator.SetBool("isFighting", state != MinchenState.Idle);
-    animator.SetBool("isWalking", state == MinchenState.Dash);
-    animator.SetInteger("walkingSpeed", 6);
-  }
-
-  //-----------------------------------------------------------------------------
-
-  void moveToEnemy()
+  bool moveToEnemy()
   {
     if (!target_enemy)
-      return;
+      return true;
 
     Vector3 v = (transform.position - target_enemy.transform.position);
     float distance = v.magnitude;
     Vector3 direction = v.normalized;
     if (distance < 2.5f)
     {
-      target_enemy = null;
-      state = MinchenState.Slash;
+      return false;
     }
     else
     {
@@ -125,6 +120,15 @@ public class Minchen : MonoBehaviour
       //rotate us over time according to speed until we are in the required rotation
       transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotate_speed);
     }
+
+    return true;
+  }
+
+  //-----------------------------------------------------------------------------
+
+  void slashEnemy()
+  {
+    target_enemy = null;
   }
 
   //-----------------------------------------------------------------------------
