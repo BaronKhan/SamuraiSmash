@@ -25,10 +25,9 @@ public class Minchen : MonoBehaviour
   private float x = 0;
   private float z = 0;
   private GameObject target_enemy = null;
-
   private Animator animator = null;
-
   private MinchenState state = MinchenState.Stance;
+  private GameObject weapon = null;
 
   //---------------------------------------------------------------------------
 
@@ -38,6 +37,7 @@ public class Minchen : MonoBehaviour
     x = transform.position.x;
     z = transform.position.z;
     animator = GetComponent<Animator>();
+    weapon = FindChildWithTag(transform, "Weapon");
   }
 
   //---------------------------------------------------------------------------
@@ -45,44 +45,48 @@ public class Minchen : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
-    processTouch();
-    updateState();
+    ProcessTouch();
+    UpdateState();
   }
 
   //---------------------------------------------------------------------------
 
-  void updateState()
+  void UpdateState()
   {
     MinchenState old_state = state;
     switch (state)
     {
       case MinchenState.Stance:
         {
+          if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stance"))
+            SetWeaponAttack(false);
           if (target_enemy)
             state = MinchenState.Dash;
           break;
         }
       case MinchenState.Dash:
         {
-          if (!moveToEnemy())
+          if (!MoveToEnemy())
             state = MinchenState.Slash;
           break;
         }
       case MinchenState.Slash:
         {
-          slashEnemy();
+          SlashEnemy();
           if (animator.GetCurrentAnimatorStateInfo(0).IsName("Slash1") && !target_enemy)
+          {
             state = MinchenState.Stance;
+          }
           break;
         }
     }
 
-    updateAnimation(old_state);
+    UpdateAnimation(old_state);
   }
 
   //-----------------------------------------------------------------------------
 
-  void updateAnimation(MinchenState old_state)
+  void UpdateAnimation(MinchenState old_state)
   {
     animator.SetBool("isFighting", true);
     animator.SetBool("isWalking", state == MinchenState.Dash);
@@ -90,7 +94,7 @@ public class Minchen : MonoBehaviour
 
     if (old_state != state)
     {
-      print(state);
+      Debug.Log("State change from " + old_state + " to " + state);
       if (state == MinchenState.Slash)
         animator.SetTrigger("slash");
     }
@@ -98,7 +102,7 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  bool moveToEnemy()
+  bool MoveToEnemy()
   {
     if (!target_enemy)
       return true;
@@ -116,8 +120,6 @@ public class Minchen : MonoBehaviour
       transform.position = Vector3.MoveTowards(transform.position, target_enemy.transform.position, step);
 
       Quaternion lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
-
-      //rotate us over time according to speed until we are in the required rotation
       transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotate_speed);
     }
 
@@ -126,14 +128,23 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  void slashEnemy()
+  void SlashEnemy()
   {
     target_enemy = null;
+    SetWeaponAttack(true);
   }
 
   //-----------------------------------------------------------------------------
 
-  void processTouch()
+  private void SetWeaponAttack(bool attack)
+  {
+    ((Weapon)weapon.GetComponent(typeof(Weapon))).SetAttack(attack);
+  }
+
+
+  //-----------------------------------------------------------------------------
+
+  void ProcessTouch()
   {
     if (Input.GetMouseButtonUp(0))
     {
@@ -149,4 +160,22 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
+  GameObject FindChildWithTag(Transform transform, string tag)
+  {
+    foreach (Transform child in transform)
+    {
+      if (child.tag == tag)
+      {
+        return child.gameObject;
+      }
+      else
+      {
+        GameObject child_child = FindChildWithTag(child, tag);
+        if (child_child)
+          return child_child;
+      }
+    }
+
+    return null;
+  }
 }
