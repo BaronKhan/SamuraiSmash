@@ -23,7 +23,7 @@ public class Weapon : MonoBehaviour
 
   public void SetAttack(bool attacking)
   {
-    Debug.Log("Weapon attacking = " + attacking);
+    // Debug.Log("Weapon attacking = " + attacking);
     if (!m_attacking && attacking)
     {
       hit_sound.PlayDelayed(hit_sound_delay);

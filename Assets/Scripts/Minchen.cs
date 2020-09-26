@@ -25,6 +25,7 @@ public class Minchen : MonoBehaviour
   private float x = 0;
   private float z = 0;
   private GameObject target_enemy = null;
+  private Vector3 target_pos;
   private Animator animator = null;
   private MinchenState state = MinchenState.Stance;
   private GameObject weapon = null;
@@ -38,6 +39,7 @@ public class Minchen : MonoBehaviour
     z = transform.position.z;
     animator = GetComponent<Animator>();
     weapon = FindChildWithTag(transform, "Weapon");
+    ResetTargetPosition();
   }
 
   //---------------------------------------------------------------------------
@@ -51,7 +53,7 @@ public class Minchen : MonoBehaviour
 
   //---------------------------------------------------------------------------
 
-  void UpdateState()
+  private void UpdateState()
   {
     MinchenState old_state = state;
     switch (state)
@@ -60,14 +62,22 @@ public class Minchen : MonoBehaviour
         {
           if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stance"))
             SetWeaponAttack(false);
-          if (target_enemy)
+          if (target_enemy || target_pos != transform.position)
             state = MinchenState.Dash;
           break;
         }
       case MinchenState.Dash:
         {
-          if (!MoveToEnemy())
-            state = MinchenState.Slash;
+          if (target_enemy)
+          {
+            if (!Move(target_enemy.transform.position))
+              state = MinchenState.Slash;
+          }
+          else
+          {
+            if (!Move(target_pos))
+              state = MinchenState.Stance;
+          }
           break;
         }
       case MinchenState.Slash:
@@ -86,7 +96,7 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  void UpdateAnimation(MinchenState old_state)
+  private void UpdateAnimation(MinchenState old_state)
   {
     animator.SetBool("isFighting", true);
     animator.SetBool("isWalking", state == MinchenState.Dash);
@@ -102,25 +112,24 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  bool MoveToEnemy()
+  private bool Move(Vector3 p)
   {
-    if (!target_enemy)
-      return true;
-
-    Vector3 v = (transform.position - target_enemy.transform.position);
+    Vector3 v = (transform.position - p);
     float distance = v.magnitude;
     Vector3 direction = v.normalized;
-    if (distance < 2.5f)
+    if ((target_enemy && distance < 2.5f) || (distance < 0.5f))
     {
-      return false;
+      {
+        ResetTargetPosition();
+        return false;
+      }
     }
     else
     {
-      float step = Time.deltaTime * movement_speed;
-      transform.position = Vector3.MoveTowards(transform.position, target_enemy.transform.position, step);
-
-      Quaternion lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
-      transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotate_speed);
+      float step = Time.deltaTime * (movement_speed * (target_enemy ? 3 : 1));
+      transform.position = Vector3.MoveTowards(transform.position, p, step);
+      Quaternion look_rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
+      transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
     }
 
     return true;
@@ -128,7 +137,7 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  void SlashEnemy()
+  private void SlashEnemy()
   {
     target_enemy = null;
     SetWeaponAttack(true);
@@ -144,7 +153,7 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  void ProcessTouch()
+  private void ProcessTouch()
   {
     if (Input.GetMouseButtonUp(0))
     {
@@ -154,13 +163,47 @@ public class Minchen : MonoBehaviour
       {
         if (hit_info.collider.tag == "Enemy")
           target_enemy = hit_info.collider.gameObject;
+        else if (hit_info.collider.tag == "Floor")
+        {
+          Debug.Log("Clicked floor");
+          target_pos = new Vector3(hit_info.point.x, transform.position.y, hit_info.point.z);
+          /*RaycastHit hit_info_hori;
+          if (Physics.Raycast(transform.position, (target_pos - transform.position), out hit_info_hori))
+          {
+            if (hit_info_hori.collider.tag == "Enemy")
+            {
+              Debug.Log("Enemy in the way");
+              target_enemy = hit_info_hori.collider.gameObject;
+              target_pos = transform.position;
+            }
+          }*/
+        }
       }
     }
   }
 
   //-----------------------------------------------------------------------------
 
-  GameObject FindChildWithTag(Transform transform, string tag)
+  private void OnTriggerEnter(Collider other)
+  {
+    Debug.Log("Minchen OnTriggerEnter");
+    if (other.tag == "Enemy")
+    {
+      Debug.Log("Collided with Enemy");
+      ResetTargetPosition();
+    }
+  }
+
+  //-----------------------------------------------------------------------------
+
+  private void ResetTargetPosition()
+  {
+    target_pos = transform.position;
+  }
+
+  //-----------------------------------------------------------------------------
+
+  private GameObject FindChildWithTag(Transform transform, string tag)
   {
     foreach (Transform child in transform)
     {

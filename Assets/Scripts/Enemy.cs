@@ -8,10 +8,12 @@ public class Enemy : MonoBehaviour
 
   private bool hit = false;
   private Vector3 direction = new Vector3(0, 0, 0);
+  private Animator animator = null;
 
   // Start is called before the first frame update
   void Start()
   {
+    animator = GetComponent<Animator>();
   }
 
   // Update is called once per frame
@@ -47,6 +49,11 @@ public class Enemy : MonoBehaviour
       Debug.Log("Enemy hit with weapon");
       hit = true;
       direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
+      if (animator)
+      {
+        animator.SetBool("isFighting", false);
+        animator.SetBool("isWalking", false);
+      }
     }
   }
 
