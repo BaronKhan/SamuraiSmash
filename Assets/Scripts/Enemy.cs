@@ -2,9 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//-----------------------------------------------------------------------------
+
+public enum EnemyState
+{
+  Idle,
+  Stance,
+  Walk,
+  Slash
+}
+
+//-----------------------------------------------------------------------------
+
 public class Enemy : MonoBehaviour
 {
   public float hit_speed = 10.0f;
+  public Vector3 target_pos = new Vector3(0, 0, 0);
 
   private bool hit = false;
   private Vector3 direction = new Vector3(0, 0, 0);
@@ -14,6 +27,9 @@ public class Enemy : MonoBehaviour
   void Start()
   {
     animator = GetComponent<Animator>();
+
+    if (target_pos.magnitude == 0f)
+      target_pos = transform.position;
   }
 
   // Update is called once per frame
@@ -28,6 +44,10 @@ public class Enemy : MonoBehaviour
     {
       float step = Time.deltaTime * hit_speed;
       transform.position += direction;
+    }
+    else
+    {
+
     }
   }
 
