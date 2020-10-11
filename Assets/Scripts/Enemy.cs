@@ -9,17 +9,19 @@ public enum EnemyState
   Idle,
   Stance,
   Walk,
-  Slash
+  Slash,
+  Dead
 }
 
 //-----------------------------------------------------------------------------
 
 public class Enemy : MonoBehaviour
 {
+  public float movement_speed = 1f;
   public float hit_speed = 10.0f;
+  public float rotate_speed = 10f;
   public Vector3 target_pos = new Vector3(0, 0, 0);
 
-  private bool hit = false;
   private Vector3 direction = new Vector3(0, 0, 0);
   private Animator animator = null;
 
@@ -27,12 +29,15 @@ public class Enemy : MonoBehaviour
   private GameObject head = null;
 
   private bool is_lowest = true;
+  private EnemyState state = EnemyState.Stance;
+  private Minchen minchen = null;
 
   //---------------------------------------------------------------------------
 
   // Start is called before the first frame update
   void Start()
   {
+    minchen = (Minchen)GameObject.FindGameObjectWithTag("Player").GetComponent(typeof(Minchen));
     animator = GetComponent<Animator>();
 
     if (target_pos.magnitude == 0f)
@@ -56,22 +61,55 @@ public class Enemy : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
-    MoveEnemy();
+    EnemyState old_state = state;
+    switch (state)
+    {
+      case EnemyState.Stance:
+      {
+        Quaternion look_rotation = Quaternion.LookRotation(minchen.transform.position - transform.position) * Quaternion.Euler(0, 270, 0);
+        transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
+        if (transform.position != target_pos)
+          state = EnemyState.Walk;
+        break;
+      }
+      case EnemyState.Dead:
+      {
+        float step = Time.deltaTime * hit_speed;
+        transform.position += direction;
+        break;
+      }
+      case EnemyState.Walk:
+      {
+        MoveEnemy(target_pos);
+        break;
+      }
+    }
+    UpdateAnimation(old_state);
     UpdateHead();
   }
 
   //---------------------------------------------------------------------------
 
-  private void MoveEnemy()
+  private void MoveEnemy(Vector3 p)
   {
-    if (hit)
+    Vector3 v = (transform.position - p);
+    float distance = v.magnitude;
+    Vector3 direction = v.normalized;
+    Quaternion look_rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
+    if (distance <= 0.01f)
     {
-      float step = Time.deltaTime * hit_speed;
-      transform.position += direction;
+      {
+        target_pos = transform.position;
+        state = EnemyState.Stance;
+        return;
+      }
     }
     else
     {
-
+      float step = Time.deltaTime * movement_speed;
+      if (distance >= 2.5f)
+        transform.position = Vector3.MoveTowards(transform.position, p, step);
+      transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
     }
   }
 
@@ -79,12 +117,31 @@ public class Enemy : MonoBehaviour
 
   private void OnTriggerEnter(Collider other)
   {
+    EnemyState old_state = state;
     Debug.Log("Enemy onTriggerEnter");
-    if (hit)
+    if (state == EnemyState.Dead)
       return;
 
     if (other.tag == "Weapon")
       CollisionWithWeapon(other);
+    UpdateAnimation(old_state);
+    UpdateHead();
+  }
+
+  //---------------------------------------------------------------------------
+
+  private void UpdateAnimation(EnemyState old_state)
+  {
+    animator.SetBool("isFighting", state != EnemyState.Dead);
+    animator.SetBool("isWalking", state == EnemyState.Walk);
+    animator.SetInteger("walkingSpeed", (state == EnemyState.Dead) ? 0 : 6);
+
+    if (old_state != state)
+    {
+      Debug.Log("Enemy state change from " + old_state + " to " + state);
+      if (state == EnemyState.Slash)
+        animator.SetTrigger("slash");
+    }
   }
 
   //---------------------------------------------------------------------------
@@ -97,18 +154,12 @@ public class Enemy : MonoBehaviour
       Debug.Log("Enemy hit with weapon");
       if (is_lowest)  // is_lowest
       {
-        hit = true;
+        state = EnemyState.Dead;
         direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
-        if (animator)
-        {
-          animator.SetBool("isFighting", false);
-          animator.SetBool("isWalking", false);
-        }
       }
       else
       {
-        Minchen player = (Minchen)GameObject.FindGameObjectWithTag("Player").GetComponent(typeof(Minchen));
-        player.Die(); 
+        minchen.Die(); 
       }
     }
   }

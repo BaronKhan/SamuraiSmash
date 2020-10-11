@@ -112,7 +112,7 @@ public class Minchen : MonoBehaviour
 
     if (old_state != state)
     {
-      Debug.Log("State change from " + old_state + " to " + state);
+      Debug.Log("Minchen state change from " + old_state + " to " + state);
       if (state == MinchenState.Slash)
         animator.SetTrigger("slash");
     }
@@ -195,7 +195,7 @@ public class Minchen : MonoBehaviour
 
   private void OnTriggerEnter(Collider other)
   {
-    Debug.Log("Minchen OnTriggerEnter");
+    // Debug.Log("Minchen OnTriggerEnter");
     if (other.tag == "Enemy")
     {
       Debug.Log("Collided with Enemy");
