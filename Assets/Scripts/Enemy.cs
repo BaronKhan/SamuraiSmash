@@ -23,8 +23,10 @@ public class Enemy : MonoBehaviour
   private Vector3 direction = new Vector3(0, 0, 0);
   private Animator animator = null;
 
-  private GameObject headText = null;
+  private GameObject head_text = null;
   private GameObject head = null;
+
+  private bool is_lowest = true;
 
   //---------------------------------------------------------------------------
 
@@ -37,7 +39,7 @@ public class Enemy : MonoBehaviour
       target_pos = transform.position;
 
     head = FindChildWithTag(transform, "Head");
-    headText = FindChildWithTag(transform, "UI");
+    head_text = FindChildWithTag(transform, "UI");
     UpdateHead();
   }
 
@@ -46,7 +48,7 @@ public class Enemy : MonoBehaviour
   private void UpdateHead()
   {
     head.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
-    headText.transform.rotation = Quaternion.Euler(new Vector3(45, 270, 0));
+    head_text.transform.rotation = Quaternion.Euler(new Vector3(45, 270, 0));
   }
 
   //---------------------------------------------------------------------------
@@ -93,12 +95,20 @@ public class Enemy : MonoBehaviour
     if (WeaponIsAttacking(other))
     {
       Debug.Log("Enemy hit with weapon");
-      hit = true;
-      direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
-      if (animator)
+      if (is_lowest)  // is_lowest
       {
-        animator.SetBool("isFighting", false);
-        animator.SetBool("isWalking", false);
+        hit = true;
+        direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
+        if (animator)
+        {
+          animator.SetBool("isFighting", false);
+          animator.SetBool("isWalking", false);
+        }
+      }
+      else
+      {
+        Minchen player = (Minchen)GameObject.FindGameObjectWithTag("Player").GetComponent(typeof(Minchen));
+        player.Die(); 
       }
     }
   }

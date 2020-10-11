@@ -9,7 +9,8 @@ public enum MinchenState
   Idle,
   Stance,
   Dash,
-  Slash
+  Slash,
+  Dead
 }
 
 //-----------------------------------------------------------------------------
@@ -21,6 +22,7 @@ public class Minchen : MonoBehaviour
 
   public float movement_speed = 1f;
   public float rotate_speed = 10f;
+  public float hit_speed = 10.0f;
 
   private float x = 0;
   private float z = 0;
@@ -89,6 +91,12 @@ public class Minchen : MonoBehaviour
           }
           break;
         }
+      case MinchenState.Dead:
+        {
+          float step = Time.deltaTime * hit_speed;
+          transform.position += Quaternion.Euler(0, 90, 0) * (-transform.forward); ;
+          break;
+        }
     }
 
     UpdateAnimation(old_state);
@@ -98,9 +106,9 @@ public class Minchen : MonoBehaviour
 
   private void UpdateAnimation(MinchenState old_state)
   {
-    animator.SetBool("isFighting", true);
+    animator.SetBool("isFighting", state != MinchenState.Dead);
     animator.SetBool("isWalking", state == MinchenState.Dash);
-    animator.SetInteger("walkingSpeed", 6);
+    animator.SetInteger("walkingSpeed", (state == MinchenState.Dead) ? 0 : 6);
 
     if (old_state != state)
     {
@@ -200,6 +208,13 @@ public class Minchen : MonoBehaviour
   private void ResetTargetPosition()
   {
     target_pos = transform.position;
+  }
+
+  //-----------------------------------------------------------------------------
+
+  public void Die()
+  {
+    state = MinchenState.Dead;
   }
 
   //-----------------------------------------------------------------------------
