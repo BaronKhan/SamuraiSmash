@@ -219,7 +219,8 @@ public class Enemy : MonoBehaviour
     if (WeaponIsAttacking(other))
     {
       Debug.Log("Enemy hit with weapon");
-      if (is_lowest)  // is_lowest
+      bool player_target = (minchen.old_target_enemy == gameObject);
+      if (is_lowest && player_target)
       {
         dead_sound.Play();
         state = EnemyState.Dead;

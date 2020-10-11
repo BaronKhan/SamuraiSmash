@@ -28,6 +28,7 @@ public class Minchen : MonoBehaviour
   private float z = 0;
   private GameObject target_enemy = null;
   private Vector3 target_pos;
+  public GameObject old_target_enemy;
   private Animator animator = null;
   private MinchenState state = MinchenState.Stance;
   private GameObject weapon = null;
@@ -205,6 +206,7 @@ public class Minchen : MonoBehaviour
           }
         }
       }
+      old_target_enemy = target_enemy;
     }
   }
 
@@ -247,7 +249,7 @@ public class Minchen : MonoBehaviour
   private bool WeaponIsAttacking(Collider other)
   {
     Weapon w = ((Weapon)other.gameObject.GetComponent(typeof(Weapon)));
-    return w.is_enemy_weapon && w.IsAttacking();
+    return w.is_enemy_weapon && w.IsAttacking() && !target_enemy && state != MinchenState.Slash;
   }
 
   //-----------------------------------------------------------------------------
