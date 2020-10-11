@@ -17,20 +17,25 @@ public enum EnemyState
 
 public class Enemy : MonoBehaviour
 {
-  public float movement_speed = 1f;
+  public float movement_speed = 3f;
   public float hit_speed = 10.0f;
   public float rotate_speed = 10f;
   public Vector3 target_pos = new Vector3(0, 0, 0);
+  public float move_distance = 3f;
 
   private Vector3 direction = new Vector3(0, 0, 0);
   private Animator animator = null;
 
   private GameObject head_text = null;
   private GameObject head = null;
+  private GameObject weapon = null;
+  private AudioSource dead_sound = null;
 
   private bool is_lowest = true;
   private EnemyState state = EnemyState.Stance;
   private Minchen minchen = null;
+
+  private int timer = 0;
 
   //---------------------------------------------------------------------------
 
@@ -39,6 +44,7 @@ public class Enemy : MonoBehaviour
   {
     minchen = (Minchen)GameObject.FindGameObjectWithTag("Player").GetComponent(typeof(Minchen));
     animator = GetComponent<Animator>();
+    dead_sound = GetComponent<AudioSource>();
 
     if (target_pos.magnitude == 0f)
       target_pos = transform.position;
@@ -46,6 +52,8 @@ public class Enemy : MonoBehaviour
     head = FindChildWithTag(transform, "Head");
     head_text = FindChildWithTag(transform, "UI");
     UpdateHead();
+
+    weapon = FindChildWithTag(transform, "Weapon");
   }
 
   //---------------------------------------------------------------------------
@@ -66,10 +74,14 @@ public class Enemy : MonoBehaviour
     {
       case EnemyState.Stance:
       {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stance"))
+          SetWeaponAttack(false);
         Quaternion look_rotation = Quaternion.LookRotation(minchen.transform.position - transform.position) * Quaternion.Euler(0, 270, 0);
         transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
         if (transform.position != target_pos)
           state = EnemyState.Walk;
+        if (timer == 0)
+          StartCoroutine(WaitToMove());
         break;
       }
       case EnemyState.Dead:
@@ -80,12 +92,62 @@ public class Enemy : MonoBehaviour
       }
       case EnemyState.Walk:
       {
+        SetWeaponAttack(false);
         MoveEnemy(target_pos);
+        break;
+      }
+      case EnemyState.Slash:
+      {
+        SlashEnemy();
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Slash1"))
+        {
+          state = EnemyState.Stance;
+        }
         break;
       }
     }
     UpdateAnimation(old_state);
     UpdateHead();
+  }
+
+  //-----------------------------------------------------------------------------
+
+  private void SlashEnemy()
+  {
+    SetWeaponAttack(true);
+  }
+
+  //-----------------------------------------------------------------------------
+
+  private void SetWeaponAttack(bool attack)
+  {
+    ((Weapon)weapon.GetComponent(typeof(Weapon))).SetAttack(attack);
+  }
+
+  //---------------------------------------------------------------------------
+
+  IEnumerator WaitToMove()
+  {
+    timer = Random.Range(3, 6) * 60;  // TODO: get actual FPS
+    for (int i = timer; i >= 0; --i)
+    {
+      --timer;
+      yield return null;
+    }
+    if (state == EnemyState.Stance)
+    {
+      SetNewTargetPos();
+    }
+    timer = 0;
+  }
+
+  //---------------------------------------------------------------------------
+
+  void SetNewTargetPos()
+  {
+    Vector3 v = (minchen.transform.position - transform.position).normalized;
+    target_pos = transform.position + (v * move_distance);
+    state = EnemyState.Walk;
   }
 
   //---------------------------------------------------------------------------
@@ -96,18 +158,23 @@ public class Enemy : MonoBehaviour
     float distance = v.magnitude;
     Vector3 direction = v.normalized;
     Quaternion look_rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
-    if (distance <= 0.01f)
+    float player_distance = (transform.position - minchen.transform.position).magnitude;
+    if (player_distance <= 2.5f)
     {
-      {
-        target_pos = transform.position;
-        state = EnemyState.Stance;
-        return;
-      }
+      target_pos = transform.position;
+      state = EnemyState.Slash;
+      return;
+    }
+    else if (distance <= 0.2f)
+    {
+      target_pos = transform.position;
+      state = EnemyState.Stance;
+      return;
     }
     else
     {
       float step = Time.deltaTime * movement_speed;
-      if (distance >= 2.5f)
+      if (distance >= 0.1f)
         transform.position = Vector3.MoveTowards(transform.position, p, step);
       transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
     }
@@ -118,7 +185,7 @@ public class Enemy : MonoBehaviour
   private void OnTriggerEnter(Collider other)
   {
     EnemyState old_state = state;
-    Debug.Log("Enemy onTriggerEnter");
+    // Debug.Log("Enemy onTriggerEnter");
     if (state == EnemyState.Dead)
       return;
 
@@ -154,6 +221,7 @@ public class Enemy : MonoBehaviour
       Debug.Log("Enemy hit with weapon");
       if (is_lowest)  // is_lowest
       {
+        dead_sound.Play();
         state = EnemyState.Dead;
         direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
       }
@@ -168,7 +236,8 @@ public class Enemy : MonoBehaviour
 
   private bool WeaponIsAttacking(Collider other)
   {
-    return ((Weapon)other.gameObject.GetComponent(typeof(Weapon))).IsAttacking();
+    Weapon w = ((Weapon)other.gameObject.GetComponent(typeof(Weapon)));
+    return !w.is_enemy_weapon && w.IsAttacking();
   }
 
   //---------------------------------------------------------------------------

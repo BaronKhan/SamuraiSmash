@@ -31,6 +31,7 @@ public class Minchen : MonoBehaviour
   private Animator animator = null;
   private MinchenState state = MinchenState.Stance;
   private GameObject weapon = null;
+  private AudioSource dead_sound = null;
 
   //---------------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ public class Minchen : MonoBehaviour
     z = transform.position.z;
     animator = GetComponent<Animator>();
     weapon = FindChildWithTag(transform, "Weapon");
+    dead_sound = GetComponent<AudioSource>();
     ResetTargetPosition();
   }
 
@@ -70,6 +72,8 @@ public class Minchen : MonoBehaviour
         }
       case MinchenState.Dash:
         {
+          // If holding down, weapon sound only plays once, reset weapon
+          SetWeaponAttack(false);
           if (target_enemy)
           {
             if (!Move(target_enemy.transform.position))
@@ -164,28 +168,41 @@ public class Minchen : MonoBehaviour
 
   private void ProcessTouch()
   {
-    if (Input.GetMouseButtonUp(0))
+    if (state == MinchenState.Slash)
+      return;
+
+    if (Input.GetMouseButton(0))
     {
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
       RaycastHit hit_info;
       if (Physics.Raycast(ray.origin, ray.direction, out hit_info))
       {
         if (hit_info.collider.tag == "Enemy")
+        {
           target_enemy = hit_info.collider.gameObject;
+        }
         else if (hit_info.collider.tag == "Floor")
         {
-          Debug.Log("Clicked floor");
+          // Debug.Log("Clicked floor");
           target_pos = new Vector3(hit_info.point.x, transform.position.y, hit_info.point.z);
-          /*RaycastHit hit_info_hori;
+          RaycastHit hit_info_hori;
+          // Debug.DrawLine(transform.position, target_pos, Color.black);
           if (Physics.Raycast(transform.position, (target_pos - transform.position), out hit_info_hori))
           {
             if (hit_info_hori.collider.tag == "Enemy")
             {
-              Debug.Log("Enemy in the way");
               target_enemy = hit_info_hori.collider.gameObject;
-              target_pos = transform.position;
+              if ((target_enemy.transform.position - transform.position).magnitude < (target_pos - transform.position).magnitude)
+              {
+                target_pos = transform.position;
+                Debug.Log("Enemy in the way");
+              }
+              else
+              {
+                target_enemy = null;
+              }
             }
-          }*/
+          }
         }
       }
     }
@@ -201,6 +218,36 @@ public class Minchen : MonoBehaviour
       Debug.Log("Collided with Enemy");
       ResetTargetPosition();
     }
+    else if (other.tag == "Weapon")
+    {
+      CollisionWithWeapon(other);
+    }
+  }
+
+  //---------------------------------------------------------------------------
+
+  private void CollisionWithWeapon(Collider other)
+  {
+    if (other.gameObject == weapon)  // ignore own weapon
+      return;
+
+    Debug.Log("Minchen collided with weapon");
+    if (WeaponIsAttacking(other))
+    {
+      Debug.Log("Minchen hit by enemy weapon");
+      Vector3 direction = (transform.position - other.transform.position).normalized;
+      Quaternion lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
+      transform.rotation = lookRotation;
+      Die();
+    }
+  }
+
+  //---------------------------------------------------------------------------
+
+  private bool WeaponIsAttacking(Collider other)
+  {
+    Weapon w = ((Weapon)other.gameObject.GetComponent(typeof(Weapon)));
+    return w.is_enemy_weapon && w.IsAttacking();
   }
 
   //-----------------------------------------------------------------------------
@@ -214,6 +261,7 @@ public class Minchen : MonoBehaviour
 
   public void Die()
   {
+    dead_sound.Play();
     state = MinchenState.Dead;
   }
 

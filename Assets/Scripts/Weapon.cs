@@ -5,6 +5,7 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
   public float hit_sound_delay = 0f;
+  public bool is_enemy_weapon = false;
 
   private bool m_attacking = false;
   private AudioSource hit_sound = null;
@@ -26,6 +27,7 @@ public class Weapon : MonoBehaviour
     // Debug.Log("Weapon attacking = " + attacking);
     if (!m_attacking && attacking)
     {
+      Debug.Log("Playing weapon sound");
       hit_sound.PlayDelayed(hit_sound_delay);
     }
     m_attacking = attacking;
