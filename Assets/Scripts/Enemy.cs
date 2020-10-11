@@ -23,6 +23,11 @@ public class Enemy : MonoBehaviour
   private Vector3 direction = new Vector3(0, 0, 0);
   private Animator animator = null;
 
+  private GameObject headText = null;
+  private GameObject head = null;
+
+  //---------------------------------------------------------------------------
+
   // Start is called before the first frame update
   void Start()
   {
@@ -30,13 +35,30 @@ public class Enemy : MonoBehaviour
 
     if (target_pos.magnitude == 0f)
       target_pos = transform.position;
+
+    head = FindChildWithTag(transform, "Head");
+    headText = FindChildWithTag(transform, "UI");
+    UpdateHead();
   }
+
+  //---------------------------------------------------------------------------
+
+  private void UpdateHead()
+  {
+    head.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+    headText.transform.rotation = Quaternion.Euler(new Vector3(45, 270, 0));
+  }
+
+  //---------------------------------------------------------------------------
 
   // Update is called once per frame
   void Update()
   {
     MoveEnemy();
+    UpdateHead();
   }
+
+  //---------------------------------------------------------------------------
 
   private void MoveEnemy()
   {
@@ -51,6 +73,8 @@ public class Enemy : MonoBehaviour
     }
   }
 
+  //---------------------------------------------------------------------------
+
   private void OnTriggerEnter(Collider other)
   {
     Debug.Log("Enemy onTriggerEnter");
@@ -60,6 +84,8 @@ public class Enemy : MonoBehaviour
     if (other.tag == "Weapon")
       CollisionWithWeapon(other);
   }
+
+  //---------------------------------------------------------------------------
 
   private void CollisionWithWeapon(Collider other)
   {
@@ -77,8 +103,33 @@ public class Enemy : MonoBehaviour
     }
   }
 
+  //---------------------------------------------------------------------------
+
   private bool WeaponIsAttacking(Collider other)
   {
     return ((Weapon)other.gameObject.GetComponent(typeof(Weapon))).IsAttacking();
   }
+
+  //---------------------------------------------------------------------------
+
+  private GameObject FindChildWithTag(Transform transform, string tag)
+  {
+    foreach (Transform child in transform)
+    {
+      if (child.tag == tag)
+      {
+        return child.gameObject;
+      }
+      else
+      {
+        GameObject child_child = FindChildWithTag(child, tag);
+        if (child_child)
+          return child_child;
+      }
+    }
+
+    return null;
+  }
+
+  //---------------------------------------------------------------------------
 }

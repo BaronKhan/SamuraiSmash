@@ -8,6 +8,8 @@ TagManager:
   - Weapon
   - Hat
   - Floor
+  - UI
+  - Head
   layers:
   - Default
   - TransparentFX
