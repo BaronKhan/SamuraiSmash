@@ -34,6 +34,8 @@ public class Minchen : MonoBehaviour
   private GameObject weapon = null;
   private AudioSource dead_sound = null;
 
+  private readonly static float enemy_min_dist = 2.5f;
+
   //---------------------------------------------------------------------------
 
   // Start is called before the first frame update
@@ -131,7 +133,7 @@ public class Minchen : MonoBehaviour
     float distance = v.magnitude;
     Vector3 direction = v.normalized;
     Quaternion look_rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
-    if ((target_enemy && distance < 2.5f && Quaternion.Angle(transform.rotation, look_rotation) <= 5f) || (distance < 0.5f))
+    if ((target_enemy && distance < enemy_min_dist && Quaternion.Angle(transform.rotation, look_rotation) <= 5f) || (distance < 0.5f))
     {
       {
         ResetTargetPosition();
@@ -141,7 +143,7 @@ public class Minchen : MonoBehaviour
     else
     {
       float step = Time.deltaTime * (movement_speed * (target_enemy ? 3 : 1));
-      if (!target_enemy || distance >= 2.5f)
+      if (!target_enemy || distance >= enemy_min_dist)
         transform.position = Vector3.MoveTowards(transform.position, p, step);
       transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
     }
@@ -164,7 +166,6 @@ public class Minchen : MonoBehaviour
     ((Weapon)weapon.GetComponent(typeof(Weapon))).SetAttack(attack);
   }
 
-
   //-----------------------------------------------------------------------------
 
   private void ProcessTouch()
@@ -181,27 +182,32 @@ public class Minchen : MonoBehaviour
         if (hit_info.collider.tag == "Enemy")
         {
           target_enemy = hit_info.collider.gameObject;
+          target_pos = transform.position;
         }
         else if (hit_info.collider.tag == "Floor")
         {
           // Debug.Log("Clicked floor");
           target_pos = new Vector3(hit_info.point.x, transform.position.y, hit_info.point.z);
-          RaycastHit hit_info_hori;
-          // Debug.DrawLine(transform.position, target_pos, Color.black);
-          if (Physics.Raycast(transform.position, (target_pos - transform.position), out hit_info_hori))
+          target_enemy = null;
+        }
+
+        // Ray cast from position to target and search for obstacles
+        Vector3 raycast_pos = (target_enemy) ? target_enemy.transform.position : target_pos;
+        RaycastHit hit_info_hori;
+        if (Physics.Raycast(transform.position, (raycast_pos - transform.position), out hit_info_hori))
+        {
+          if (hit_info_hori.collider.tag == "Enemy")
           {
-            if (hit_info_hori.collider.tag == "Enemy")
+            GameObject raycast_obj = hit_info_hori.collider.gameObject;
+            if ((raycast_obj.transform.position - transform.position).magnitude < (raycast_pos - transform.position).magnitude)
             {
-              target_enemy = hit_info_hori.collider.gameObject;
-              if ((target_enemy.transform.position - transform.position).magnitude < (target_pos - transform.position).magnitude)
-              {
+              Debug.Log("Enemy in the way");
+              Vector3 dist = (raycast_obj.transform.position - transform.position);
+              if (dist.magnitude <= enemy_min_dist)
                 target_pos = transform.position;
-                Debug.Log("Enemy in the way");
-              }
               else
-              {
-                target_enemy = null;
-              }
+                target_pos = raycast_obj.transform.position;
+              target_enemy = null;
             }
           }
         }
