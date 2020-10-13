@@ -56,6 +56,11 @@ public class Minchen : MonoBehaviour
   {
     ProcessTouch();
     UpdateState();
+
+    if (OutsideView())
+    {
+      Destroy(gameObject);
+    }
   }
 
   //---------------------------------------------------------------------------
@@ -293,4 +298,13 @@ public class Minchen : MonoBehaviour
 
     return null;
   }
+
+  //-----------------------------------------------------------------------------
+
+  private bool OutsideView()
+  {
+    return transform.position.magnitude > 50;
+  }
+
+  //-----------------------------------------------------------------------------
 }

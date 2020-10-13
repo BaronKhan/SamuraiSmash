@@ -42,7 +42,6 @@ public class Enemy : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    minchen = (Minchen)GameObject.FindGameObjectWithTag("Player").GetComponent(typeof(Minchen));
     animator = GetComponent<Animator>();
     dead_sound = GetComponent<AudioSource>();
 
@@ -69,6 +68,14 @@ public class Enemy : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+    GameObject player = GameObject.FindGameObjectWithTag("Player");
+    if (!player)
+    {
+      minchen = null;
+      return;
+    }
+    minchen = (Minchen)player.GetComponent(typeof(Minchen));
+
     EnemyState old_state = state;
     switch (state)
     {
@@ -108,6 +115,11 @@ public class Enemy : MonoBehaviour
     }
     UpdateAnimation(old_state);
     UpdateHead();
+
+    if (OutsideView())
+    {
+      Destroy(gameObject);
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -145,6 +157,8 @@ public class Enemy : MonoBehaviour
 
   void SetNewTargetPos()
   {
+    if (!minchen)
+      return;
     Vector3 v = (minchen.transform.position - transform.position).normalized;
     target_pos = transform.position + (v * move_distance);
     state = EnemyState.Walk;
@@ -260,6 +274,13 @@ public class Enemy : MonoBehaviour
     }
 
     return null;
+  }
+
+  //---------------------------------------------------------------------------
+
+  private bool OutsideView()
+  {
+    return transform.position.magnitude > 50;
   }
 
   //---------------------------------------------------------------------------
