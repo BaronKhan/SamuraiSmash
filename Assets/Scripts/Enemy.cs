@@ -26,16 +26,20 @@ public class Enemy : MonoBehaviour
   private Vector3 direction = new Vector3(0, 0, 0);
   private Animator animator = null;
 
-  private GameObject head_text = null;
+  public GameObject head_text = null;
   private GameObject head = null;
   private GameObject weapon = null;
   private AudioSource dead_sound = null;
 
-  private bool is_lowest = true;
+  public bool is_lowest = true;
   private EnemyState state = EnemyState.Stance;
   private Minchen minchen = null;
 
+  private CTRL ctrl = null;
+
   private int timer = 0;
+
+  private bool ready = false;
 
   //---------------------------------------------------------------------------
 
@@ -46,13 +50,24 @@ public class Enemy : MonoBehaviour
     dead_sound = GetComponent<AudioSource>();
 
     if (target_pos.magnitude == 0f)
+    {
+      ready = true;
       target_pos = transform.position;
+    }
+    else
+    {
+      state = EnemyState.Walk;
+    }
 
     head = FindChildWithTag(transform, "Head");
     head_text = FindChildWithTag(transform, "UI");
     UpdateHead();
 
     weapon = FindChildWithTag(transform, "Weapon");
+
+    GameObject ctrl_obj = GameObject.FindWithTag("GameController");
+    if (ctrl_obj)
+      ctrl = ((CTRL)ctrl_obj.GetComponent(typeof(CTRL)));
   }
 
   //---------------------------------------------------------------------------
@@ -118,6 +133,8 @@ public class Enemy : MonoBehaviour
 
     if (OutsideView())
     {
+      if (ctrl)
+        ctrl.OnEnemyDestroyed(((Enemy)gameObject.GetComponent(typeof(Enemy))));
       Destroy(gameObject);
     }
   }
@@ -182,6 +199,8 @@ public class Enemy : MonoBehaviour
     else if (distance <= 0.2f)
     {
       target_pos = transform.position;
+      if (!ready)
+        ready = true;
       state = EnemyState.Stance;
       return;
     }
@@ -189,7 +208,7 @@ public class Enemy : MonoBehaviour
     {
       float step = Time.deltaTime * movement_speed;
       if (distance >= 0.1f)
-        transform.position = Vector3.MoveTowards(transform.position, p, step);
+        transform.position = Vector3.MoveTowards(transform.position, p, step * (ready ? 1 : movement_speed));
       transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
     }
   }

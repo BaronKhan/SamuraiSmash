@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class HeadText : MonoBehaviour
 {
-  private enum TextType
+  public enum TextType
   {
     Int,
     Float,
+    Symbol,
     Fraction,
-    Symbol
   };
 
   public TextMesh text_mesh_frac = null;
