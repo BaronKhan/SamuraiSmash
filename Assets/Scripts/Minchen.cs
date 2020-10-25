@@ -24,6 +24,12 @@ public class Minchen : MonoBehaviour
   public float rotate_speed = 10f;
   public float hit_speed = 10.0f;
 
+  public bool has_boundary = false;
+  public float boundary_left = -1;
+  public float boundary_right = -1;
+  public float boundary_top = -1;
+  public float boundary_bottom = -1;
+
   private float x = 0;
   private float z = 0;
   private GameObject target_enemy = null;
@@ -218,6 +224,12 @@ public class Minchen : MonoBehaviour
         }
       }
       old_target_enemy = target_enemy;
+
+      if (has_boundary)
+      {
+        target_pos.z = Mathf.Clamp(target_pos.z, boundary_left, boundary_right);
+        target_pos.x = Mathf.Clamp(target_pos.x, boundary_top, boundary_bottom);
+      }
     }
   }
 

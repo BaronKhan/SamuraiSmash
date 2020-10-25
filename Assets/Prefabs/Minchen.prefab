@@ -831,6 +831,7 @@ MonoBehaviour:
   movement_speed: 7
   rotate_speed: 10
   hit_speed: 10
+  old_target_enemy: {fileID: 0}
 --- !u!54 &252462325807088062
 Rigidbody:
   m_ObjectHideFlags: 0
