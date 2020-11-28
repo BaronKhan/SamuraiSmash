@@ -15,8 +15,12 @@ public enum EnemyState
 
 //-----------------------------------------------------------------------------
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 {
+  public int head_text_int = 0;
+  public HeadText.TextType head_text_type = HeadText.TextType.Int;
+  public bool head_text_updated = false;
+
   public float movement_speed = 3f;
   public float hit_speed = 10.0f;
   public float rotate_speed = 10f;
@@ -31,7 +35,7 @@ public class Enemy : MonoBehaviour
   private GameObject weapon = null;
   private AudioSource dead_sound = null;
 
-  public bool is_lowest = true;
+  private bool is_lowest = false;
   private EnemyState state = EnemyState.Stance;
   private Minchen minchen = null;
 
@@ -74,8 +78,19 @@ public class Enemy : MonoBehaviour
 
   private void UpdateHead()
   {
+    if (!head)
+      return;
     head.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
     head_text.transform.rotation = Quaternion.Euler(new Vector3(45, 270, 0));
+  }
+
+  //---------------------------------------------------------------------------
+
+  private void UpdateHeadText()
+  {
+    var ht = ((HeadText)head_text.GetComponent(typeof(HeadText)));
+    if (head_text_type == HeadText.TextType.Int)
+      ht.SetInteger(head_text_int);
   }
 
   //---------------------------------------------------------------------------
@@ -83,6 +98,9 @@ public class Enemy : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+    if (!head_text_updated && head_text)
+      UpdateHeadText();
+
     GameObject player = GameObject.FindGameObjectWithTag("Player");
     if (!player)
     {
@@ -133,8 +151,6 @@ public class Enemy : MonoBehaviour
 
     if (OutsideView())
     {
-      if (ctrl)
-        ctrl.OnEnemyDestroyed(((Enemy)gameObject.GetComponent(typeof(Enemy))));
       Destroy(gameObject);
     }
   }
@@ -232,6 +248,8 @@ public class Enemy : MonoBehaviour
 
   private void UpdateAnimation(EnemyState old_state)
   {
+    if (!animator)
+      return;
     animator.SetBool("isFighting", state != EnemyState.Dead);
     animator.SetBool("isWalking", state == EnemyState.Walk);
     animator.SetInteger("walkingSpeed", (state == EnemyState.Dead) ? 0 : 6);
@@ -258,6 +276,8 @@ public class Enemy : MonoBehaviour
         dead_sound.Play();
         state = EnemyState.Dead;
         direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
+        if (ctrl)
+          ctrl.OnEnemyDead((Enemy)gameObject.GetComponent(typeof(Enemy)));
       }
       else
       {
@@ -300,6 +320,37 @@ public class Enemy : MonoBehaviour
   private bool OutsideView()
   {
     return transform.position.magnitude > 50;
+  }
+
+  //---------------------------------------------------------------------------
+
+  public double GetValue()
+  {
+    switch (head_text_type)
+    {
+      case HeadText.TextType.Int:
+        {
+          return head_text_int;
+        }
+      default:
+        {
+          return 0.0;
+        }
+    }
+  }
+
+  //---------------------------------------------------------------------------
+
+  int System.IComparable<Enemy>.CompareTo(Enemy other)
+  {
+    return GetValue().CompareTo(GetValue());
+  }
+
+  //---------------------------------------------------------------------------
+
+  public void SetLowest(bool lowest)
+  {
+    is_lowest = lowest;
   }
 
   //---------------------------------------------------------------------------
