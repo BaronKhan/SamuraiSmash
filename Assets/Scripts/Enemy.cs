@@ -17,8 +17,12 @@ public enum EnemyState
 
 public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 {
-  public int head_text_int = 0;
   public HeadText.TextType head_text_type = HeadText.TextType.Int;
+  public int head_text_int = 0;
+  public float head_text_float = 0.0f;
+  public char head_text_symbol = 'e';
+  public int head_text_num = 0;
+  public int head_text_den = 0;
   public bool head_text_updated = false;
 
   public float movement_speed = 3f;
@@ -44,6 +48,8 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   private int timer = 0;
 
   private bool ready = false;
+
+  private double move_time_ms = 0.0;
 
   //---------------------------------------------------------------------------
 
@@ -89,8 +95,30 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   private void UpdateHeadText()
   {
     var ht = ((HeadText)head_text.GetComponent(typeof(HeadText)));
-    if (head_text_type == HeadText.TextType.Int)
-      ht.SetInteger(head_text_int);
+    switch (head_text_type)
+    {
+      case HeadText.TextType.Int:
+        {
+          ht.SetInteger(head_text_int);
+          break;
+        }
+      case HeadText.TextType.Float:
+        {
+          ht.SetFloat(head_text_float);
+          break;
+        }
+      case HeadText.TextType.Fraction:
+        {
+          ht.SetFraction(head_text_num, head_text_den);
+          break;
+        }
+      case HeadText.TextType.Symbol:
+        {
+          ht.SetSymbol(head_text_symbol);
+          break;
+        }
+    }
+
   }
 
   //---------------------------------------------------------------------------
@@ -126,7 +154,6 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
       }
       case EnemyState.Dead:
       {
-        float step = Time.deltaTime * hit_speed;
         transform.position += direction;
         break;
       }
@@ -195,6 +222,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     Vector3 v = (minchen.transform.position - transform.position).normalized;
     target_pos = transform.position + (v * move_distance);
     state = EnemyState.Walk;
+    move_time_ms = System.DateTime.Now.Millisecond;
   }
 
   //---------------------------------------------------------------------------
@@ -329,14 +357,23 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     switch (head_text_type)
     {
       case HeadText.TextType.Int:
-        {
-          return head_text_int;
-        }
+        return head_text_int;
+      case HeadText.TextType.Float:
+        return head_text_float;
+      case HeadText.TextType.Fraction:
+        return (head_text_den == 0) ? 0 : ((double)head_text_num) / ((double)head_text_den);
+      case HeadText.TextType.Symbol:
+        return GetSymbolValue(head_text_symbol);
       default:
-        {
-          return 0.0;
-        }
+        return 0;
     }
+  }
+
+  //---------------------------------------------------------------------------
+
+  private double GetSymbolValue(char symbol)
+  {
+    return 0.0;
   }
 
   //---------------------------------------------------------------------------

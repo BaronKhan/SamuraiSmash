@@ -318,5 +318,12 @@ public class Minchen : MonoBehaviour
     return transform.position.magnitude > 50;
   }
 
+  //----------------------------------------------------------------------------
+
+  public void Reset()
+  {
+    target_pos = new Vector3(-1.886657f, transform.position.y, 0);
+  }
+
   //-----------------------------------------------------------------------------
 }
