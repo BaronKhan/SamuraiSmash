@@ -65,7 +65,7 @@ public class HeadText : MonoBehaviour
   public bool SetFloat(float f)
   {
     text_type = TextType.Float;
-    return SetText(f.ToString());
+    return SetText(f.ToString("0.00"));
   }
   public bool SetSymbol(char c)
   {
