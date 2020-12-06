@@ -10,6 +10,7 @@ TagManager:
   - Floor
   - UI
   - Head
+  - Symbol
   layers:
   - Default
   - TransparentFX

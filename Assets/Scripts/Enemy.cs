@@ -45,11 +45,12 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 
   private CTRL ctrl = null;
 
-  private int timer = 0;
-
   private bool ready = false;
 
   private double move_time_ms = 0.0;
+
+  private Renderer anger_symbol_renderer = null;
+  private bool is_waiting = false;
 
   //---------------------------------------------------------------------------
 
@@ -78,6 +79,10 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     GameObject ctrl_obj = GameObject.FindWithTag("GameController");
     if (ctrl_obj)
       ctrl = ((CTRL)ctrl_obj.GetComponent(typeof(CTRL)));
+
+    GameObject anger_symbol = FindChildWithTag(transform, "Symbol");
+    anger_symbol_renderer = anger_symbol.GetComponent<Renderer>();
+    anger_symbol_renderer.enabled = false;
   }
 
   //---------------------------------------------------------------------------
@@ -148,7 +153,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
         transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
         if (transform.position != target_pos)
           state = EnemyState.Walk;
-        if (timer == 0)
+        if (!is_waiting)
           StartCoroutine(WaitToMove());
         break;
       }
@@ -161,6 +166,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
       {
         SetWeaponAttack(false);
         MoveEnemy(target_pos);
+        anger_symbol_renderer.enabled = false;
         break;
       }
       case EnemyState.Slash:
@@ -200,17 +206,25 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 
   IEnumerator WaitToMove()
   {
-    timer = Random.Range(3, 6) * 60;  // TODO: get actual FPS
-    for (int i = timer; i >= 0; --i)
-    {
-      --timer;
-      yield return null;
-    }
+    if (is_waiting)
+      yield break;
+
+    is_waiting = true;
+
+    yield return new WaitForSeconds(Random.Range(2, 5));
+
+    anger_symbol_renderer.enabled = true;
+
+    yield return new WaitForSeconds(1);
+
+    anger_symbol_renderer.enabled = false;
+
     if (state == EnemyState.Stance)
     {
       SetNewTargetPos();
     }
-    timer = 0;
+
+    is_waiting = false;
   }
 
   //---------------------------------------------------------------------------
