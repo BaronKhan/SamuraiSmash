@@ -28,7 +28,7 @@ public class CTRL : MonoBehaviour
 
   /*private int m_level = 1;*/
 
-  public int m_score = 0;
+  private Score m_score = null;
 
   private bool flip_enemies = false;
   private int[] rearrange_digits = { 0, 0, 0, 0, 0 };
@@ -45,6 +45,8 @@ public class CTRL : MonoBehaviour
       return;
     }
     minchen = (Minchen)player.GetComponent(typeof(Minchen));
+
+    m_score = GetComponentInChildren<Score>();
 
     AddEnemies(3);
   }
@@ -267,7 +269,7 @@ public class CTRL : MonoBehaviour
   {
     Debug.Log("OnEnemyDead");
 
-    ++m_score;
+    m_score.Increment();
 
     if (enemy != m_enemies.Values.First())
       Debug.LogWarning("Enemy was defeated but isn't at the front of the list");
