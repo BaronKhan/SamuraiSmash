@@ -689,7 +689,7 @@ GameObject:
   - component: {fileID: 882688388}
   - component: {fileID: 882688387}
   m_Layer: 0
-  m_Name: HeadTextFrac
+  m_Name: ScoreText
   m_TagString: UI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -819,6 +819,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_score: 0
+  m_max_score: 0
 --- !u!102 &1357998962
 TextMesh:
   serializedVersion: 3
