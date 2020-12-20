@@ -19,6 +19,7 @@ public class CTRL : MonoBehaviour
 {
   public GameObject restart = null;
   public GameObject home = null;
+  public GameObject high_score_text = null;
 
   private static readonly float s_enemy_y = 0.4154629f;  // TODO: calibrate this
   private static readonly float s_enemy_below_offset = 11f;
@@ -45,6 +46,8 @@ public class CTRL : MonoBehaviour
       restart.SetActive(false);
     if (home)
       home.SetActive(false);
+    if (high_score_text)
+      high_score_text.SetActive(false);
     GameObject player = GameObject.FindGameObjectWithTag("Player");
     if (!player)
     {
@@ -295,6 +298,9 @@ public class CTRL : MonoBehaviour
     Debug.Log("Game Over");
     if (show_symbol)
       m_enemies.ElementAt(0).Value.red_circle_renderer.enabled = true;
+
+    if (m_score.m_score > m_score.m_max_score && high_score_text)
+      high_score_text.SetActive(true);
   }
 
   //---------------------------------------------------------------------------

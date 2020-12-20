@@ -237,6 +237,9 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     }
 
     is_waiting = false;
+
+    if (!head_text.activeSelf)
+      head_text.SetActive(true);
   }
 
   //---------------------------------------------------------------------------
@@ -417,4 +420,16 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   }
 
   //---------------------------------------------------------------------------
+
+  void OnApplicationFocus(bool hasFocus)
+  {
+    head_text.SetActive(hasFocus);
+  }
+
+  //---------------------------------------------------------------------------
+
+  void OnApplicationPause(bool pauseStatus)
+  {
+    head_text.SetActive(!pauseStatus);
+  }
 }
