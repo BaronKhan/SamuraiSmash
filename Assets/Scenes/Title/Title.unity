@@ -1525,6 +1525,21 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2045226585814971352, guid: b571edb9f79c5ab48bb80107b2793621,
+        type: 3}
+      propertyPath: change_hat_disable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045226585814971352, guid: b571edb9f79c5ab48bb80107b2793621,
+        type: 3}
+      propertyPath: m_camera
+      value: 
+      objectReference: {fileID: 1968711335}
+    - target: {fileID: 2045226585814971352, guid: b571edb9f79c5ab48bb80107b2793621,
+        type: 3}
+      propertyPath: m_change_hat_disable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2838600931302731148, guid: b571edb9f79c5ab48bb80107b2793621,
         type: 3}
       propertyPath: m_Enabled
@@ -1633,6 +1648,11 @@ PrefabInstance:
     - target: {fileID: 8461587378739605078, guid: b571edb9f79c5ab48bb80107b2793621,
         type: 3}
       propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8508869452256820560, guid: b571edb9f79c5ab48bb80107b2793621,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8659183821704134621, guid: b571edb9f79c5ab48bb80107b2793621,
