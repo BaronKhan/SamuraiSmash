@@ -283,9 +283,10 @@ public class CTRL : MonoBehaviour
 
   //---------------------------------------------------------------------------
 
-  public void OnGameOver()
+  public void OnGameOver(bool show_symbol = true)
   {
     Debug.Log("Game Over");
-    m_enemies.ElementAt(0).Value.red_circle_renderer.enabled = true;
+    if (show_symbol)
+      m_enemies.ElementAt(0).Value.red_circle_renderer.enabled = true;
   }
 }

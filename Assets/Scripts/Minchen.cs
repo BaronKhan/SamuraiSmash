@@ -266,7 +266,7 @@ public class Minchen : MonoBehaviour
       Vector3 direction = (transform.position - other.transform.position).normalized;
       Quaternion lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
       transform.rotation = lookRotation;
-      Die();
+      Die(false);
     }
   }
 
@@ -287,11 +287,11 @@ public class Minchen : MonoBehaviour
 
   //-----------------------------------------------------------------------------
 
-  public void Die()
+  public void Die(bool show_symbol = true)
   {
     dead_sound.Play();
     state = MinchenState.Dead;
-    ctrl.OnGameOver();
+    ctrl.OnGameOver(show_symbol);
   }
 
   //-----------------------------------------------------------------------------
