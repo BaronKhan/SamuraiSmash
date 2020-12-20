@@ -42,6 +42,8 @@ public class Minchen : MonoBehaviour
 
   private readonly static float enemy_min_dist = 2.5f;
 
+  private CTRL ctrl = null;
+
   //---------------------------------------------------------------------------
 
   // Start is called before the first frame update
@@ -53,6 +55,7 @@ public class Minchen : MonoBehaviour
     weapon = FindChildWithTag(transform, "Weapon");
     dead_sound = GetComponent<AudioSource>();
     ResetTargetPosition();
+    ctrl = (CTRL)GameObject.FindGameObjectWithTag("GameController").GetComponent(typeof(CTRL));
   }
 
   //---------------------------------------------------------------------------
@@ -288,6 +291,7 @@ public class Minchen : MonoBehaviour
   {
     dead_sound.Play();
     state = MinchenState.Dead;
+    ctrl.OnGameOver();
   }
 
   //-----------------------------------------------------------------------------

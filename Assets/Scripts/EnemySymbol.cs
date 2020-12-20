@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AngerSymbol : MonoBehaviour
+public class EnemySymbol : MonoBehaviour
 {
   public float speed = 5;
   public float scale = 0.2f;

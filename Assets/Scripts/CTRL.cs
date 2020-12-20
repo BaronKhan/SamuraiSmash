@@ -280,4 +280,12 @@ public class CTRL : MonoBehaviour
     else
       m_enemies.Values.First().SetLowest(true);
   }
+
+  //---------------------------------------------------------------------------
+
+  public void OnGameOver()
+  {
+    Debug.Log("Game Over");
+    m_enemies.ElementAt(0).Value.red_circle_renderer.enabled = true;
+  }
 }

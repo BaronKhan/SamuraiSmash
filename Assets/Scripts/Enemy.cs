@@ -50,6 +50,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   private double move_time_ms = 0.0;
 
   private Renderer anger_symbol_renderer = null;
+  public Renderer red_circle_renderer = null;
   private bool is_waiting = false;
 
   //---------------------------------------------------------------------------
@@ -83,6 +84,10 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     GameObject anger_symbol = FindChildWithTag(transform, "Symbol");
     anger_symbol_renderer = anger_symbol.GetComponent<Renderer>();
     anger_symbol_renderer.enabled = false;
+
+    GameObject red_circle = FindChildWithTag(transform, "RedCircle");
+    red_circle_renderer = red_circle.GetComponent<Renderer>();
+    red_circle_renderer.enabled = false;
   }
 
   //---------------------------------------------------------------------------

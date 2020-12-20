@@ -11,6 +11,8 @@ TagManager:
   - UI
   - Head
   - Symbol
+  - Water
+  - RedCircle
   layers:
   - Default
   - TransparentFX
