@@ -68,6 +68,7 @@ public class Minchen : MonoBehaviour
 
     if (OutsideView())
     {
+      ctrl.OnMinchenDestroyed();
       Destroy(gameObject);
     }
   }

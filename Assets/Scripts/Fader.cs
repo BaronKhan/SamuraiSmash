@@ -5,15 +5,16 @@ using UnityEngine.UI;
 
 public class Fader : MonoBehaviour
 {
-  public bool fade_in = false;
+  public bool m_fade_in = false;
   public float m_fade_speed = 1f;
+  public int m_scene_index = 0;
 
   private Image m_image = null;
 
   // Start is called before the first frame update
   void Start()
   {
-    if (fade_in)
+    if (m_fade_in)
       SetFadeType(false);
   }
 
@@ -39,7 +40,7 @@ public class Fader : MonoBehaviour
       yield return null;
     }
 
-    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    SceneManager.LoadScene(m_scene_index);
   }
 
   // Update is called once per frame
@@ -50,12 +51,13 @@ public class Fader : MonoBehaviour
 
   public Fader SetFadeType(bool fade_out)
   {
-    return SetFadeType(fade_out, m_fade_speed);
+    return SetFadeType(fade_out, m_fade_speed, m_scene_index);
   }
 
-  public Fader SetFadeType(bool fade_out, float fade_speed)
+  public Fader SetFadeType(bool fade_out, float fade_speed, int scene_index)
   {
     m_fade_speed = fade_speed;
+    m_scene_index = scene_index;
     m_image = GetComponent<Image>();
     m_image.color = new Color(0, 0, 0, fade_out ? 0 : 1);
 

@@ -17,6 +17,9 @@ enum GroupType
 
 public class CTRL : MonoBehaviour
 {
+  public GameObject restart = null;
+  public GameObject home = null;
+
   private static readonly float s_enemy_y = 0.4154629f;  // TODO: calibrate this
   private static readonly float s_enemy_below_offset = 11f;
   private static readonly float s_enemy_above_offset = 11f;
@@ -38,6 +41,10 @@ public class CTRL : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
+    if (restart)
+      restart.SetActive(false);
+    if (home)
+      home.SetActive(false);
     GameObject player = GameObject.FindGameObjectWithTag("Player");
     if (!player)
     {
@@ -288,5 +295,16 @@ public class CTRL : MonoBehaviour
     Debug.Log("Game Over");
     if (show_symbol)
       m_enemies.ElementAt(0).Value.red_circle_renderer.enabled = true;
+  }
+
+  //---------------------------------------------------------------------------
+
+  public void OnMinchenDestroyed()
+  {
+    Debug.Log("Minchen Destroyed");
+    if (restart)
+      restart.SetActive(true);
+    if (home)
+      home.SetActive(true);
   }
 }

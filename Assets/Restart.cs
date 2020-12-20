@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Title : MonoBehaviour, IPointerClickHandler
+public class Restart : MonoBehaviour, IPointerClickHandler
 {
   private bool started = false;
   private Fader fader = null;
@@ -27,8 +27,9 @@ public class Title : MonoBehaviour, IPointerClickHandler
     Debug.Log("Play button clicked");
     if (!started)
     {
+      transform.SetAsLastSibling();
       fader.gameObject.SetActive(true);
-      fader.SetFadeType(true, 0.25f, SceneManager.GetActiveScene().buildIndex + 1);
+      fader.SetFadeType(true, 0.25f, SceneManager.GetActiveScene().buildIndex);
       started = true;
     }
   }
