@@ -44,6 +44,12 @@ public class Minchen : MonoBehaviour
 
   private CTRL ctrl = null;
 
+  private bool dead = false;
+  public bool Dead
+  {
+    get { return dead; }
+    set { dead = value; }
+  }
   //---------------------------------------------------------------------------
 
   // Start is called before the first frame update
@@ -290,6 +296,7 @@ public class Minchen : MonoBehaviour
 
   public void Die(bool show_symbol = true)
   {
+    dead = true;
     dead_sound.Play();
     state = MinchenState.Dead;
     ctrl.OnGameOver(show_symbol);

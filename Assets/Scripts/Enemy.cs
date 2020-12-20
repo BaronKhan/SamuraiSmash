@@ -136,6 +136,12 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   // Update is called once per frame
   void Update()
   {
+    if (minchen && minchen.Dead)
+    {
+      animator.SetBool("isWalking", false);
+      return;
+    }
+
     if (!head_text_updated && head_text)
       UpdateHeadText();
 
@@ -184,6 +190,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
         break;
       }
     }
+
     UpdateAnimation(old_state);
     UpdateHead();
 
