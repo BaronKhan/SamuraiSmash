@@ -226,7 +226,7 @@ public class CTRL : MonoBehaviour
 
   private void SetDecimalValue(Enemy new_enemy)
   {
-    int multiplier = Math.Max(1, Math.Min((int)((m_level - 3) / m_multiplier_scaler), 5));
+    int multiplier = Math.Max(1, Math.Min((int)((m_level - 2) / m_multiplier_scaler), 2));
     new_enemy.head_text_type = HeadText.TextType.Float;
     do
     {
@@ -238,7 +238,7 @@ public class CTRL : MonoBehaviour
   //---------------------------------------------------------------------------
   private void SetFractionalValue(Enemy new_enemy)
   {
-    int multiplier = Math.Max(1, Math.Min((int)((m_level - 4) / m_multiplier_scaler), 3));
+    int multiplier = Math.Max(1, Math.Min((int)((m_level - 3) / m_multiplier_scaler), 3));
     new_enemy.head_text_type = HeadText.TextType.Fraction;
     do
     {
@@ -255,7 +255,7 @@ public class CTRL : MonoBehaviour
   private void SetSymbolValue(Enemy new_enemy)
   {
     float prob = UnityEngine.Random.Range(0.0f, 1.0f);
-    float threshold = 0.25f * Math.Min(Math.Max(1, (int)((m_level - 5) / m_multiplier_scaler)), 3);
+    float threshold = 0.25f * Math.Min(Math.Max(1, (int)((m_level - 4) / m_multiplier_scaler)), 3);
     if (prob < threshold)
     {
       char[] symbols = { 'e', 'π', 'φ' };
