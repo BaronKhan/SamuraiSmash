@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Hat : MonoBehaviour
 {
@@ -22,13 +23,21 @@ public class Hat : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    if (PlayerPrefs.HasKey("HatIndex"))
-      m_enabled_hat = PlayerPrefs.GetInt("HatIndex");
-    else if (PlayerPrefs.HasKey("Score") && PlayerPrefs.GetInt("Score") > 6)
-      m_enabled_hat = Random.Range(0, m_hats_count);
     m_hats = GetComponentsInChildren<MeshRenderer>();
     m_hats_count = m_hats.Length;
     Debug.Log("Got " + m_hats_count.ToString() + " hats");
+
+    if (SceneManager.GetActiveScene().name == "Title" && PlayerPrefs.HasKey("Score") && PlayerPrefs.GetInt("Score") > 9
+        && !PlayerPrefs.HasKey("ChangedHat"))
+    {
+      m_enabled_hat = Random.Range(0, m_hats_count);
+      PlayerPrefs.SetInt("HatIndex", m_enabled_hat);
+      PlayerPrefs.Save();
+
+    }
+    else if (PlayerPrefs.HasKey("HatIndex"))
+      m_enabled_hat = PlayerPrefs.GetInt("HatIndex");
+
     UpdateHat();
   }
 
@@ -48,6 +57,7 @@ public class Hat : MonoBehaviour
         {
           m_enabled_hat = (m_enabled_hat + 1) % m_hats_count;
           PlayerPrefs.SetInt("HatIndex", m_enabled_hat);
+          PlayerPrefs.SetInt("ChangedHat", 1);
           PlayerPrefs.Save();
           UpdateHat();
         }

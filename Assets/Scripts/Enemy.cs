@@ -328,7 +328,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     {
       Debug.Log("Enemy hit with weapon");
       bool player_target = (minchen.old_target_enemy == gameObject);
-      if (player_target)
+      if (player_target || is_lowest)
       {
         if (is_lowest)
         {

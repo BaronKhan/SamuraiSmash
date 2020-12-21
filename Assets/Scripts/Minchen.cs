@@ -154,6 +154,8 @@ public class Minchen : MonoBehaviour
     float distance = v.magnitude;
     Vector3 direction = v.normalized;
     Quaternion look_rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
+    // Added for instant look
+    transform.rotation = look_rotation;
     if ((target_enemy && distance < enemy_min_dist && Quaternion.Angle(transform.rotation, look_rotation) <= 5f) || (distance < 0.5f))
     {
       {
@@ -166,7 +168,7 @@ public class Minchen : MonoBehaviour
       float step = Time.deltaTime * (movement_speed * (target_enemy ? 3 : 1));
       if (!target_enemy || distance >= enemy_min_dist)
         transform.position = Vector3.MoveTowards(transform.position, p, step);
-      transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
+      /*transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);*/
     }
 
     return true;

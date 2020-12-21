@@ -10,8 +10,8 @@ enum GroupType
   Negative,
   Rearrange,
   Decimal,
-  Fractions,
   Constants,
+  Fractions,
   /*Randomise*/
 }
 
@@ -94,11 +94,12 @@ public class CTRL : MonoBehaviour
 
   private GroupType GetRandomGroupType()
   {
+    float bias = UnityEngine.Random.Range(0.0f, Mathf.Min(0.05f * m_level, 0.5f));
     float prob = UnityEngine.Random.Range(0.0f, 1.0f);
     float n = Enum.GetNames(typeof(GroupType)).Length;
-    for (int i = 1; i <= Math.Min(m_level, n); ++i)
+    for (int i = 1; i <= Math.Max(1, Math.Min(m_level, n)); ++i)
     {
-      if (prob < (i / n))
+      if (Math.Min(prob + bias, 1) <= (i / n))
         return (GroupType)(i - 1);
     }
 
@@ -236,6 +237,29 @@ public class CTRL : MonoBehaviour
   }
 
   //---------------------------------------------------------------------------
+
+  private void SetSymbolValue(Enemy new_enemy)
+  {
+    do
+    {
+      float prob = UnityEngine.Random.Range(0.0f, 1.0f);
+      float threshold = 0.25f * Math.Min(Math.Max(1, (int)((m_level - 3) / m_multiplier_scaler)), 3);
+      if (prob < threshold)
+      {
+        char[] symbols = { 'e', 'π', 'φ' };
+        new_enemy.head_text_type = HeadText.TextType.Symbol;
+        new_enemy.head_text_symbol = symbols[UnityEngine.Random.Range(0, symbols.Length)];
+      }
+      else
+      {
+        new_enemy.head_text_type = HeadText.TextType.Int;
+        new_enemy.head_text_int = UnityEngine.Random.Range(0, 4);
+      }
+    }
+    while (m_enemies.ContainsKey(new_enemy.GetValue()));
+  }
+
+  //---------------------------------------------------------------------------
   private void SetFractionalValue(Enemy new_enemy)
   {
     int multiplier = Math.Max(1, Math.Min((int)((m_level - 3) / m_multiplier_scaler), 3));
@@ -248,33 +272,6 @@ public class CTRL : MonoBehaviour
       new_enemy.head_text_den = den;
     }
     while (EnemiesHaveValueWithinRange(new_enemy.GetValue()));
-  }
-
-  //---------------------------------------------------------------------------
-
-  private void SetSymbolValue(Enemy new_enemy)
-  {
-    float prob = UnityEngine.Random.Range(0.0f, 1.0f);
-    float threshold = 0.25f * Math.Min(Math.Max(1, (int)((m_level - 4) / m_multiplier_scaler)), 3);
-    if (prob < threshold)
-    {
-      char[] symbols = { 'e', 'π', 'φ' };
-      new_enemy.head_text_type = HeadText.TextType.Symbol;
-      do
-      {
-        new_enemy.head_text_symbol = symbols[UnityEngine.Random.Range(0, symbols.Length)];
-      }
-      while (m_enemies.ContainsKey(new_enemy.GetValue()));
-    }
-    else
-    {
-      new_enemy.head_text_type = HeadText.TextType.Int;
-      do
-      {
-        new_enemy.head_text_int = UnityEngine.Random.Range(0, 4);
-      }
-      while (m_enemies.ContainsKey(new_enemy.GetValue()));
-    }
   }
 
 //---------------------------------------------------------------------------
@@ -304,8 +301,8 @@ private bool EnemiesHaveValueWithinRange(double value)
       case GroupType.Negative : { SetNegativeValue(new_enemy)  ; break; }
       case GroupType.Rearrange: { SetRearrangeValue(new_enemy) ; break; }
       case GroupType.Decimal  : { SetDecimalValue(new_enemy)   ; break; }
-      case GroupType.Fractions: { SetFractionalValue(new_enemy); break; }
       case GroupType.Constants: { SetSymbolValue(new_enemy)    ; break; }
+      case GroupType.Fractions: { SetFractionalValue(new_enemy); break; }
     }
   }
 
