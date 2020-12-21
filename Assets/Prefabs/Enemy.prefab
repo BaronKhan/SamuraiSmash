@@ -606,8 +606,8 @@ MonoBehaviour:
   rotate_speed: 10
   target_pos: {x: 0, y: 0, z: 0}
   move_distance: 5
-  head_text: {fileID: 0}
-  red_circle_renderer: {fileID: 0}
+  head_text: {fileID: 7051695827166728996}
+  red_circle_renderer: {fileID: 4492995175275446904}
 --- !u!54 &1767637925495032218
 Rigidbody:
   m_ObjectHideFlags: 0
