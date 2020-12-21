@@ -10,6 +10,8 @@ public class Weapon : MonoBehaviour
   private bool m_attacking = false;
   private AudioSource hit_sound = null;
 
+  public Enemy enemy_owner = null;
+
   // Start is called before the first frame update
   void Start()
   {

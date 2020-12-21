@@ -42,6 +42,7 @@ public class HeadText : MonoBehaviour
 
   private bool SetText(string s)
   {
+    text_mesh.fontStyle = (text_type == TextType.Symbol) ? FontStyle.Italic : FontStyle.Normal;
     int len = text_mesh.text.Length;
     if (len > text_max_len)
     {

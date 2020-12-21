@@ -328,17 +328,20 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     {
       Debug.Log("Enemy hit with weapon");
       bool player_target = (minchen.old_target_enemy == gameObject);
-      if (is_lowest && player_target)
+      if (player_target)
       {
-        dead_sound.Play();
-        state = EnemyState.Dead;
-        direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
-        if (ctrl)
-          ctrl.OnEnemyDead((Enemy)gameObject.GetComponent(typeof(Enemy)));
-      }
-      else
-      {
-        minchen.Die(); 
+        if (is_lowest)
+        {
+          dead_sound.Play();
+          state = EnemyState.Dead;
+          direction = Quaternion.Euler(0, 90, 0) * (-transform.forward);
+          if (ctrl)
+            ctrl.OnEnemyDead((Enemy)gameObject.GetComponent(typeof(Enemy)));
+        }
+        else
+        {
+          minchen.Die();
+        }
       }
     }
   }
@@ -402,6 +405,14 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 
   private double GetSymbolValue(char symbol)
   {
+    switch (symbol)
+    {
+      case 'e': return Mathf.Exp(1);
+      case 'π': return Mathf.PI;
+      case 'φ': return 1.61803398875;
+    }
+
+    Debug.LogWarning("Unknown symbol " + symbol);
     return 0.0;
   }
 

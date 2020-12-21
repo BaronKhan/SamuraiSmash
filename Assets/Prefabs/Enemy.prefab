@@ -1083,6 +1083,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hit_sound_delay: 0
   is_enemy_weapon: 1
+  enemy_owner: {fileID: 5444548784107595777}
 --- !u!82 &6918193605851692770
 AudioSource:
   m_ObjectHideFlags: 0
