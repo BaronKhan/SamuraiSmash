@@ -174,7 +174,7 @@ PlayerSettings:
     Android: com.khan.SamuraiSmash
   buildNumber: {}
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 29
+  AndroidMinSdkVersion: 28
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
   aotOptions: 
