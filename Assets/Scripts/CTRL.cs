@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 enum GroupType
 {
@@ -20,6 +21,7 @@ public class CTRL : MonoBehaviour
   public GameObject restart = null;
   public GameObject home = null;
   public GameObject high_score_text = null;
+  public Text dead_high_score_text = null;
 
   private static readonly float s_enemy_y = 0.4154629f;  // TODO: calibrate this
   private static readonly float s_enemy_below_offset = 11f;
@@ -369,6 +371,16 @@ private bool EnemiesHaveValueWithinRange(double value)
     Debug.Log("Game Over");
     if (show_symbol)
       m_enemies.Values.First().red_circle_renderer.enabled = true;
+
+    foreach (Enemy enemy in m_enemies.Values)
+    {
+      if (enemy.head_text_type == HeadText.TextType.Symbol)
+      {
+        enemy.head_text_float = (float)enemy.GetValue();
+        enemy.head_text_type = HeadText.TextType.Float;
+        enemy.head_text_updated = false;
+      }
+    }
   }
 
   //---------------------------------------------------------------------------
@@ -383,5 +395,7 @@ private bool EnemiesHaveValueWithinRange(double value)
 
     if (m_score.m_score > m_score.m_max_score && high_score_text)
       high_score_text.SetActive(true);
+    else if (dead_high_score_text && m_score.m_max_score > 0)
+      dead_high_score_text.text = m_score.m_max_score.ToString();
   }
 }
