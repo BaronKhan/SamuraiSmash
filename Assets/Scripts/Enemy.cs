@@ -51,6 +51,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 
   private Renderer anger_symbol_renderer = null;
   public Renderer red_circle_renderer = null;
+  public Renderer target_renderer = null;
   private bool is_waiting = false;
 
   //---------------------------------------------------------------------------
@@ -88,6 +89,8 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
     GameObject red_circle = FindChildWithTag(transform, "RedCircle");
     red_circle_renderer = red_circle.GetComponent<Renderer>();
     red_circle_renderer.enabled = false;
+
+    target_renderer.enabled = false;
   }
 
   //---------------------------------------------------------------------------
@@ -136,10 +139,18 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   // Update is called once per frame
   void Update()
   {
-    if (minchen && minchen.Dead)
+    if (minchen)
     {
-      animator.SetBool("isWalking", false);
-      return;
+      if (minchen.Dead)
+      {
+        animator.SetBool("isWalking", false);
+        target_renderer.enabled = false;
+        return;
+      }
+
+      if (target_renderer && minchen.target_enemy)
+        target_renderer.enabled = (minchen.target_enemy == gameObject);
+
     }
 
     if (!head_text_updated && head_text)

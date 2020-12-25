@@ -24,8 +24,8 @@ public class CTRL : MonoBehaviour
   public Text dead_high_score_text = null;
 
   private static readonly float s_enemy_y = 0.4154629f;  // TODO: calibrate this
-  private static readonly float s_enemy_below_offset = 11f;
-  private static readonly float s_enemy_above_offset = 11f;
+  private static readonly float s_enemy_below_offset = 21f;
+  private static readonly float s_enemy_above_offset = 21f;
 
   public Enemy enemy_prefab = null;
 
@@ -63,7 +63,7 @@ public class CTRL : MonoBehaviour
 
     m_score = GetComponentInChildren<Score>();
 
-    AddEnemies(3);
+    AddEnemies(6);
   }
 
   //---------------------------------------------------------------------------
@@ -113,21 +113,29 @@ public class CTRL : MonoBehaviour
 
   private void ShowFtue()
   {
-    if (m_enemies.Keys.Count > 0 && m_score.m_max_score < 6 && m_score.m_score < 6)
+    if (m_enemies.Keys.Count > 0 && m_score.m_max_score < 7 && m_score.m_score < 6)
       m_enemies.Values.First().red_circle_renderer.enabled = true;
   }
 
   //---------------------------------------------------------------------------
 
-  private void AddEnemies(int enemy_count = 3)
+  private void AddEnemies(int enemy_count = 2)
   {
-    (float, float, bool)[] positions_x_z_below  = {
+    /*(float, float, bool)[] positions_x_z_below  = {
       (2.7f, 2.4f, true),
       (2.7f, -2.4f, true),
       (5.797773f, 0, true),
       (-6.797773f, 0, false),
       (-3.7f, 2.4f, false),
       (-3.7f, -2.4f, false),
+    };*/
+    (float, float, bool)[] positions_x_z_below = {
+      (11.7f, 1.4f, true),
+      (11.7f, -1.4f, true),
+      (9.1f, 4.0f, true),
+      (9.1f, -4.0f, true),
+      (5, 4.9f, true),
+      (5, -4.9f, true),
     };
 
     if (flip_enemies)
@@ -186,11 +194,11 @@ public class CTRL : MonoBehaviour
   private void SetRearrangeValue(Enemy new_enemy)
   {
     new_enemy.head_text_type = HeadText.TextType.Int;
-    int multiplier = Math.Max(0, Math.Min((int)((m_level - 2) / m_multiplier_scaler) - 1, 2));
-    // group into 3, if new group, generate new 5 digit array, choose random rearrangement otherwise
-    if ((m_enemies.Count() % 3) == 0)
+    int multiplier = Math.Max(0, Math.Min((int)((m_level - 2) / m_multiplier_scaler) - 1, 1));
+    // group into 4, if new group, generate new 5 digit array, choose random rearrangement otherwise
+    if ((m_enemies.Count() % 4) == 0)
     {
-      int val = UnityEngine.Random.Range(100 * (int)Math.Pow(10, multiplier), 1000 * (int)Math.Pow(10, multiplier));
+      int val = UnityEngine.Random.Range(1000 * (int)Math.Pow(10, multiplier), 10000 * (int)Math.Pow(10, multiplier));
       new_enemy.head_text_int = val;
       for (int i = 0; i < 3 + multiplier; ++i)
       {
@@ -329,7 +337,12 @@ private bool EnemiesHaveValueWithinRange(double value)
   IEnumerator AddEnemiesAfterTime(float time)
   {
     yield return new WaitForSeconds(time);
-    AddEnemies(m_score.m_score >= 30 ? 6 : 3);
+    if (m_score.m_score >= 30)
+      AddEnemies(6);
+    else if (m_score.m_score > 5)
+      AddEnemies(4);
+    else
+      AddEnemies(2);
   }
 
   //---------------------------------------------------------------------------

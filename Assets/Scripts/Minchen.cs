@@ -32,7 +32,7 @@ public class Minchen : MonoBehaviour
 
   private float x = 0;
   private float z = 0;
-  private GameObject target_enemy = null;
+  public GameObject target_enemy = null;
   private Vector3 target_pos;
   public GameObject old_target_enemy;
   private Animator animator = null;
@@ -45,6 +45,7 @@ public class Minchen : MonoBehaviour
   private CTRL ctrl = null;
 
   private bool dead = false;
+  private bool resetting = false;
   public bool Dead
   {
     get { return dead; }
@@ -117,6 +118,10 @@ public class Minchen : MonoBehaviour
           {
             state = MinchenState.Stance;
           }
+          if (target_enemy)
+          {
+            OnTriggerEnter(weapon.GetComponent<Collider>());
+          }
           break;
         }
       case MinchenState.Dead:
@@ -160,6 +165,9 @@ public class Minchen : MonoBehaviour
     {
       {
         ResetTargetPosition();
+        if (resetting)
+          transform.rotation = Quaternion.Euler(0, 0, 0);
+        resetting = false;
         return false;
       }
     }
@@ -198,6 +206,7 @@ public class Minchen : MonoBehaviour
 
     if (Input.GetMouseButton(0))
     {
+      resetting = false;
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
       RaycastHit hit_info;
       if (Physics.Raycast(ray.origin, ray.direction, out hit_info))
@@ -337,6 +346,7 @@ public class Minchen : MonoBehaviour
   public void Reset()
   {
     target_pos = new Vector3(-1.886657f, transform.position.y, 0);
+    resetting = true;
   }
 
   //-----------------------------------------------------------------------------
