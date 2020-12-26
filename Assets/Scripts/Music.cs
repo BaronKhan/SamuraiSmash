@@ -8,6 +8,11 @@ public class Music : MonoBehaviour
 
   private void Awake()
   {
+    foreach (var obj in GameObject.FindGameObjectsWithTag("Music"))
+    {
+      if (obj != gameObject)
+        Destroy(obj);
+    }
     DontDestroyOnLoad(transform.gameObject);
     m_audio_source = GetComponent<AudioSource>();
   }
