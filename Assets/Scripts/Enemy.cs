@@ -238,7 +238,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
 
     anger_symbol_renderer.enabled = true;
 
-    yield return new WaitForSeconds(1);
+    yield return new WaitForSeconds(2);
 
     anger_symbol_renderer.enabled = false;
 

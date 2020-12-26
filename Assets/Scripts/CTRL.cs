@@ -138,10 +138,10 @@ public class CTRL : MonoBehaviour
     (float, float, bool)[] positions_x_z_below = {
       (9.1f, 4.0f, true),
       (9.1f, -4.0f, true),
-      (11.7f, 1.4f, true),
-      (11.7f, -1.4f, true),
-      (5, 4.9f, true),
-      (5, -4.9f, true),
+      (12.7f, 1.4f, true),
+      (12.7f, -1.4f, true),
+      (3, 4.9f, true),
+      (3, -4.9f, true),
     };
 
     if (flip_enemies)
@@ -345,7 +345,7 @@ private bool EnemiesHaveValueWithinRange(double value)
     yield return new WaitForSeconds(time);
     if (m_score.m_score >= 30)
       AddEnemies(6);
-    else if (m_score.m_score > 5)
+    else if (m_score.m_score > 3)
       AddEnemies(4);
     else
       AddEnemies(2);

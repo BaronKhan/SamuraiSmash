@@ -212,9 +212,11 @@ public class Minchen : MonoBehaviour
     if (state == MinchenState.Slash || target_enemy)
       return;
 
+    if (resetting)
+      return;
+
     if (Input.GetMouseButton(0))
     {
-      resetting = false;
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
       RaycastHit hit_info;
       if (Physics.Raycast(ray.origin, ray.direction, out hit_info))
