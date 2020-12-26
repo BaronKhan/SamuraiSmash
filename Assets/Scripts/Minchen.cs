@@ -133,6 +133,14 @@ public class Minchen : MonoBehaviour
     }
 
     UpdateAnimation(old_state);
+
+    if (state != MinchenState.Dead)
+    {
+      transform.position = new Vector3(
+        Mathf.Clamp(transform.position.x, boundary_top, boundary_bottom),
+        transform.position.y,
+        Mathf.Clamp(transform.position.z, boundary_left, boundary_right));
+    }
   }
 
   //-----------------------------------------------------------------------------
@@ -160,7 +168,7 @@ public class Minchen : MonoBehaviour
     Vector3 direction = v.normalized;
     Quaternion look_rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 90, 0);
     // Added for instant look
-    transform.rotation = look_rotation;
+    // transform.rotation = look_rotation;
     if ((target_enemy && distance < enemy_min_dist && Quaternion.Angle(transform.rotation, look_rotation) <= 5f) || (distance < 0.5f))
     {
       {
@@ -176,7 +184,7 @@ public class Minchen : MonoBehaviour
       float step = Time.deltaTime * (movement_speed * (target_enemy ? 3 : 1));
       if (!target_enemy || distance >= enemy_min_dist)
         transform.position = Vector3.MoveTowards(transform.position, p, step);
-      /*transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);*/
+      transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, Time.deltaTime * rotate_speed);
     }
 
     return true;
@@ -201,7 +209,7 @@ public class Minchen : MonoBehaviour
 
   private void ProcessTouch()
   {
-    if (state == MinchenState.Slash)
+    if (state == MinchenState.Slash || target_enemy)
       return;
 
     if (Input.GetMouseButton(0))

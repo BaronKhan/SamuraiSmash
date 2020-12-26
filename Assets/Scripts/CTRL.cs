@@ -22,6 +22,7 @@ public class CTRL : MonoBehaviour
   public GameObject home = null;
   public GameObject high_score_text = null;
   public Text dead_high_score_text = null;
+  public Text ftue_help_text = null;
 
   private static readonly float s_enemy_y = 0.4154629f;  // TODO: calibrate this
   private static readonly float s_enemy_below_offset = 21f;
@@ -63,7 +64,7 @@ public class CTRL : MonoBehaviour
 
     m_score = GetComponentInChildren<Score>();
 
-    AddEnemies(6);
+    AddEnemies(2);
   }
 
   //---------------------------------------------------------------------------
@@ -115,6 +116,11 @@ public class CTRL : MonoBehaviour
   {
     if (m_enemies.Keys.Count > 0 && m_score.m_max_score < 7 && m_score.m_score < 6)
       m_enemies.Values.First().red_circle_renderer.enabled = true;
+
+    if (ftue_help_text && m_score.m_max_score > 1)
+      ftue_help_text.text = " ";
+    else
+      ftue_help_text.text = "Tap the ground to move.\n\nTap an enemy to attack!";
   }
 
   //---------------------------------------------------------------------------
@@ -130,10 +136,10 @@ public class CTRL : MonoBehaviour
       (-3.7f, -2.4f, false),
     };*/
     (float, float, bool)[] positions_x_z_below = {
-      (11.7f, 1.4f, true),
-      (11.7f, -1.4f, true),
       (9.1f, 4.0f, true),
       (9.1f, -4.0f, true),
+      (11.7f, 1.4f, true),
+      (11.7f, -1.4f, true),
       (5, 4.9f, true),
       (5, -4.9f, true),
     };
@@ -381,6 +387,7 @@ private bool EnemiesHaveValueWithinRange(double value)
 
   public void OnGameOver(bool show_symbol = true)
   {
+    ftue_help_text.text = "";
     Debug.Log("Game Over");
     if (show_symbol)
       m_enemies.Values.First().red_circle_renderer.enabled = true;

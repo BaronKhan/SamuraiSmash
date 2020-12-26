@@ -10,7 +10,7 @@ public class Score : MonoBehaviour
   private TextMesh text_mesh = null;
 
   // Start is called before the first frame update
-  void Start()
+  void Awake()
   {
     text_mesh = GetComponent<TextMesh>();
     if (PlayerPrefs.HasKey("Score"))
@@ -34,7 +34,11 @@ public class Score : MonoBehaviour
   public void Increment()
   {
     if (++m_score >= m_max_score)
+    {
+      if (m_score > m_max_score)
+        m_max_score = m_score;
       SaveScore();
+    }
     text_mesh.text = m_score.ToString();
   }
 }
