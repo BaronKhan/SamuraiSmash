@@ -1,11 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Title : MonoBehaviour, IPointerClickHandler
+public class DemoButton : MonoBehaviour, IPointerClickHandler
 {
   private bool started = false;
   private Fader fader = null;
@@ -28,15 +28,7 @@ public class Title : MonoBehaviour, IPointerClickHandler
     if (!started)
     {
       fader.gameObject.SetActive(true);
-      if (!PlayerPrefs.HasKey("Watched"))
-      {
-        fader.SetFadeType(true, 0.25f, SceneManager.GetActiveScene().buildIndex + 1);
-        PlayerPrefs.SetInt("Watched", 1);
-        PlayerPrefs.Save();
-      }
-      else
-        fader.SetFadeType(true, 0.25f, SceneManager.GetActiveScene().buildIndex + 2);
-
+      fader.SetFadeType(true, 0.25f, SceneManager.GetActiveScene().buildIndex + 1);
       started = true;
     }
   }

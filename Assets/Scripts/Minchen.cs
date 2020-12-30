@@ -23,6 +23,7 @@ public class Minchen : MonoBehaviour
   public float movement_speed = 1f;
   public float rotate_speed = 10f;
   public float hit_speed = 10.0f;
+  public bool is_demo = false;
 
   public bool has_boundary = false;
   public float boundary_left = -1;
@@ -75,7 +76,8 @@ public class Minchen : MonoBehaviour
 
     if (OutsideView())
     {
-      ctrl.OnMinchenDestroyed();
+      if (ctrl)
+        ctrl.OnMinchenDestroyed();
       Destroy(gameObject);
     }
   }
@@ -209,10 +211,7 @@ public class Minchen : MonoBehaviour
 
   private void ProcessTouch()
   {
-    if (state == MinchenState.Slash || target_enemy)
-      return;
-
-    if (resetting)
+    if (state == MinchenState.Slash || target_enemy || is_demo || resetting)
       return;
 
     if (Input.GetMouseButton(0))
@@ -320,7 +319,8 @@ public class Minchen : MonoBehaviour
     dead = true;
     dead_sound.Play();
     state = MinchenState.Dead;
-    ctrl.OnGameOver(show_symbol);
+    if (ctrl)
+      ctrl.OnGameOver(show_symbol);
   }
 
   //-----------------------------------------------------------------------------

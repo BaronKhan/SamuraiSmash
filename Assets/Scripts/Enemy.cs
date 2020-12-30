@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour, System.IComparable<Enemy>
   private AudioSource dead_sound = null;
 
   private bool is_lowest = false;
-  private EnemyState state = EnemyState.Stance;
+  public EnemyState state = EnemyState.Stance;
   private Minchen minchen = null;
 
   private CTRL ctrl = null;

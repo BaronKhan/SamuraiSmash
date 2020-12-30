@@ -5,24 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-enum GroupType
+public class Demo : MonoBehaviour
 {
-  Range,
-  Negative,
-  Rearrange,
-  Decimal,
-  Constants,
-  Fractions,
-  /*Randomise*/
-}
-
-public class CTRL : MonoBehaviour
-{
-  public GameObject restart = null;
-  public GameObject home = null;
-  public GameObject high_score_text = null;
-  public Text dead_high_score_text = null;
-  public Text ftue_help_text = null;
 
   private static readonly float s_enemy_y = 0.4154629f;  // TODO: calibrate this
   private static readonly float s_enemy_below_offset = 21f;
@@ -36,8 +20,6 @@ public class CTRL : MonoBehaviour
   private int m_level = 1;
   private float m_multiplier_scaler = 1.5f;
 
-  private Score m_score = null;
-
   private bool flip_enemies = false;
   private int[] rearrange_digits = { 0, 0, 0, 0, 0 };
 
@@ -48,12 +30,6 @@ public class CTRL : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    if (restart)
-      restart.SetActive(false);
-    if (home)
-      home.SetActive(false);
-    if (high_score_text)
-      high_score_text.SetActive(false);
     GameObject player = GameObject.FindGameObjectWithTag("Player");
     if (!player)
     {
@@ -61,8 +37,6 @@ public class CTRL : MonoBehaviour
       return;
     }
     minchen = (Minchen)player.GetComponent(typeof(Minchen));
-
-    m_score = GetComponentInChildren<Score>();
 
     AddEnemies(2);
   }
@@ -74,17 +48,31 @@ public class CTRL : MonoBehaviour
   {
     if (!slow_update)
       StartCoroutine(SlowUpdate());
+
+
+    if (m_enemies.Values.Count > 0 && m_enemies.Values.First())
+    {
+      if (m_enemies.Values.First().transform.position.x < 13)
+        minchen.target_enemy = m_enemies.Values.First().gameObject;
+
+      if (m_enemies.Values.First().state == EnemyState.Dead)
+        OnEnemyDead(m_enemies.Values.First());
+    }
+
+    if (m_enemies.Values.Count == 0)
+      AddEnemiesAfterTime(1);
   }
 
   //---------------------------------------------------------------------------
 
   private IEnumerator SlowUpdate()
   {
+    while (Time.timeSinceLevelLoad < 3)
+      yield return null;
+
     slow_update = true;
 
     yield return new WaitForSeconds(1);
-
-    ShowFtue();
 
     // paranoia
     if (m_enemies.Values.Count > 0)
@@ -108,19 +96,6 @@ public class CTRL : MonoBehaviour
 
     Debug.LogWarning("Returning default group type");
     return GroupType.Range;
-  }
-
-  //---------------------------------------------------------------------------
-
-  private void ShowFtue()
-  {
-    if (m_enemies.Keys.Count > 0 && m_score.m_max_score < 7 && m_score.m_score < 6)
-      m_enemies.Values.First().red_circle_renderer.enabled = true;
-
-    if (ftue_help_text && m_score.m_max_score > 1)
-      ftue_help_text.text = " ";
-    else
-      ftue_help_text.text = "Tap the ground to move.\n\nTap an enemy to attack.\n\nAttack the smallest one first!";
   }
 
   //---------------------------------------------------------------------------
@@ -165,8 +140,6 @@ public class CTRL : MonoBehaviour
 
     Debug.Log($"Smallest: {m_enemies.Keys.First()}, {m_enemies.Values.First()}");
 
-    ShowFtue();
-
   }
 
   //---------------------------------------------------------------------------
@@ -190,7 +163,7 @@ public class CTRL : MonoBehaviour
     new_enemy.head_text_type = HeadText.TextType.Int;
     do
     {
-      new_enemy.head_text_int = UnityEngine.Random.Range(-(int)Math.Pow(10, Math.Max(1, multiplier-1)), (int)Math.Pow(10, multiplier));
+      new_enemy.head_text_int = UnityEngine.Random.Range(-(int)Math.Pow(10, Math.Max(1, multiplier - 1)), (int)Math.Pow(10, multiplier));
     }
     while (m_enemies.ContainsKey(new_enemy.GetValue()));
   }
@@ -282,17 +255,17 @@ public class CTRL : MonoBehaviour
     new_enemy.head_text_type = HeadText.TextType.Fraction;
     do
     {
-      int num = UnityEngine.Random.Range(1, (int)Math.Pow(10, multiplier-1));
-      int den = UnityEngine.Random.Range(num+1, (int)Math.Pow(10, multiplier));
+      int num = UnityEngine.Random.Range(1, (int)Math.Pow(10, multiplier - 1));
+      int den = UnityEngine.Random.Range(num + 1, (int)Math.Pow(10, multiplier));
       new_enemy.head_text_num = num;
       new_enemy.head_text_den = den;
     }
     while (EnemiesHaveValueWithinRange(new_enemy.GetValue()));
   }
 
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
 
-private bool EnemiesHaveValueWithinRange(double value)
+  private bool EnemiesHaveValueWithinRange(double value)
   {
     foreach (var enemy in m_enemies)
     {
@@ -313,11 +286,11 @@ private bool EnemiesHaveValueWithinRange(double value)
     // TODO: map of range type to callback
     switch (type)
     {
-      case GroupType.Range    : { SetRangeValue(new_enemy)     ; break; }
-      case GroupType.Negative : { SetNegativeValue(new_enemy)  ; break; }
-      case GroupType.Rearrange: { SetRearrangeValue(new_enemy) ; break; }
-      case GroupType.Decimal  : { SetDecimalValue(new_enemy)   ; break; }
-      case GroupType.Constants: { SetSymbolValue(new_enemy)    ; break; }
+      case GroupType.Range: { SetRangeValue(new_enemy); break; }
+      case GroupType.Negative: { SetNegativeValue(new_enemy); break; }
+      case GroupType.Rearrange: { SetRearrangeValue(new_enemy); break; }
+      case GroupType.Decimal: { SetDecimalValue(new_enemy); break; }
+      case GroupType.Constants: { SetSymbolValue(new_enemy); break; }
       case GroupType.Fractions: { SetFractionalValue(new_enemy); break; }
     }
   }
@@ -343,12 +316,7 @@ private bool EnemiesHaveValueWithinRange(double value)
   IEnumerator AddEnemiesAfterTime(float time)
   {
     yield return new WaitForSeconds(time);
-    if (m_score.m_score >= 30)
-      AddEnemies(6);
-    else if (m_score.m_score > 3)
-      AddEnemies(4);
-    else
-      AddEnemies(2);
+    AddEnemies(2);
   }
 
   //---------------------------------------------------------------------------
@@ -365,13 +333,6 @@ private bool EnemiesHaveValueWithinRange(double value)
   {
     Debug.Log("OnEnemyDead");
 
-    m_score.Increment();
-    if (m_score.m_score % 3 == 0)
-    {
-      ++m_level;
-       Debug.Log("level = " + m_level);
-    }
-
     if (enemy != m_enemies.Values.First())
       Debug.LogWarning("Enemy was defeated but isn't at the front of the list");
     m_enemies.RemoveAt(0);
@@ -379,15 +340,12 @@ private bool EnemiesHaveValueWithinRange(double value)
       ResetState();
     else
       m_enemies.Values.First().SetLowest(true);
-
-    ShowFtue();
   }
 
   //---------------------------------------------------------------------------
 
   public void OnGameOver(bool show_symbol = true)
   {
-    ftue_help_text.text = "";
     Debug.Log("Game Over");
     if (show_symbol)
       m_enemies.Values.First().red_circle_renderer.enabled = true;
@@ -409,14 +367,5 @@ private bool EnemiesHaveValueWithinRange(double value)
   public void OnMinchenDestroyed()
   {
     Debug.Log("Minchen Destroyed");
-    if (restart)
-      restart.SetActive(true);
-    if (home)
-      home.SetActive(true);
-
-    if (m_score.m_score > m_score.m_max_score && high_score_text)
-      high_score_text.SetActive(true);
-    else if (dead_high_score_text && m_score.m_max_score > 0)
-      dead_high_score_text.text = m_score.m_max_score.ToString();
   }
 }
